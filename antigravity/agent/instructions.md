@@ -64,6 +64,7 @@ Before executing any milestone, the agent must read and understand:
 ### Business Logic
 - agent/docs/account-schema.md
 - agent/docs/sample-account-configs.md
+- agent/docs/propfirm-model.md
 
 ### Account Configurations
 - agent/configs/25k-eval-v1.json

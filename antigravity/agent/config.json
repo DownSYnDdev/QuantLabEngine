@@ -31,6 +31,7 @@
         "./agent/docs/nextjs.md",
         "./agent/docs/account-schema.md",
         "./agent/docs/sample-account-configs.md",
+        "./agent/docs/propfirm-model.md",
         "./agent/configs/25k-eval-v1.json",
         "./agent/configs/25k-straight-v1.json",
         "./agent/configs/50k-eval-v1.json",
