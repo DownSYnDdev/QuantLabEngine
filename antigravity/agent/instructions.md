@@ -63,4 +63,15 @@ Before executing any milestone, the agent must read and understand:
 
 ### Business Logic
 - agent/docs/account-schema.md
+- agent/docs/sample-account-configs.md
+
+### Account Configurations
+- agent/configs/25k-eval-v1.json
+- agent/configs/25k-straight-v1.json
+- agent/configs/50k-eval-v1.json
+- agent/configs/50k-straight-v1.json
+- agent/configs/100k-eval-v1.json
+- agent/configs/100k-straight-v1.json
+- agent/configs/150k-eval-v1.json
+- agent/configs/150k-straight-v1.json
 
