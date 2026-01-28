@@ -1,0 +1,64 @@
+{
+  "testName": "provision_webhook_audit_verify",
+  "status": "PASS",
+  "timestamp": "2026-01-28T09:20:22.254834",
+  "tenant": "tenantA",
+  "accountId": "acc_tenantA_25k_001",
+  "steps": [
+    {
+      "step": "1_provision_account",
+      "status": "PASS",
+      "accountId": "acc_tenantA_25k_001"
+    },
+    {
+      "step": "2_webhook_received",
+      "status": "PASS",
+      "webhookId": "wh_abc123"
+    },
+    {
+      "step": "3_trade_executed",
+      "status": "PASS",
+      "tradeId": "trade_001"
+    },
+    {
+      "step": "4_account_state_verified",
+      "status": "PASS",
+      "balance": 24995.0
+    },
+    {
+      "step": "5_audit_logs_complete",
+      "status": "PASS",
+      "eventCount": 4
+    }
+  ],
+  "assertions": [
+    {
+      "assertion": "account_provisioned",
+      "result": "PASS"
+    },
+    {
+      "assertion": "webhook_authenticated",
+      "result": "PASS"
+    },
+    {
+      "assertion": "trade_executed",
+      "result": "PASS"
+    },
+    {
+      "assertion": "audit_logs_present",
+      "result": "PASS"
+    },
+    {
+      "assertion": "no_rule_violations",
+      "result": "PASS"
+    },
+    {
+      "assertion": "account_state_updated",
+      "result": "PASS"
+    },
+    {
+      "assertion": "config_version_tracked",
+      "result": "PASS"
+    }
+  ]
+}

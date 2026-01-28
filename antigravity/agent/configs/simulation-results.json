@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-01-27T09:54:23.962121",
+  "timestamp": "2026-01-28T09:14:17.703410",
   "simulation_type": "dry-run",
   "endpoint": "POST /internal/simulate-config",
   "total_configs": 8,
