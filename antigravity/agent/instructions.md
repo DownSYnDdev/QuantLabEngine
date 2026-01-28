@@ -70,6 +70,10 @@ Before executing any milestone, the agent must read and understand:
 - agent/docs/event-contracts.md
 - agent/docs/webhook-bots.md
 - agent/docs/tenant-config.md
+- agent/docs/rule-engine.md
+- agent/docs/audit-log.md
+- agent/docs/api-endpoints.md
+- agent/docs/algobot-marketplace.md
 
 ### Account Configurations
 - agent/configs/25k-eval-v1.json
