@@ -6,21 +6,22 @@ from pathlib import Path
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Load the schema
-schema_path = Path("antigravity/agent/docs/account-schema.md")
+script_dir = Path(__file__).parent
+schema_path = script_dir.parent / "docs" / "account-schema.md"
 schema_content = schema_path.read_text(encoding='utf-8')
 schema_match = schema_content.split('```json\n')[1].split('\n```')[0]
 schema = json.loads(schema_match)
 
 # Config files to validate
 config_files = [
-    "antigravity/agent/configs/25k-eval-v1.json",
-    "antigravity/agent/configs/25k-straight-v1.json",
-    "antigravity/agent/configs/50k-eval-v1.json",
-    "antigravity/agent/configs/50k-straight-v1.json",
-    "antigravity/agent/configs/100k-eval-v1.json",
-    "antigravity/agent/configs/100k-straight-v1.json",
-    "antigravity/agent/configs/150k-eval-v1.json",
-    "antigravity/agent/configs/150k-straight-v1.json",
+    script_dir / "25k-eval-v1.json",
+    script_dir / "25k-straight-v1.json",
+    script_dir / "50k-eval-v1.json",
+    script_dir / "50k-straight-v1.json",
+    script_dir / "100k-eval-v1.json",
+    script_dir / "100k-straight-v1.json",
+    script_dir / "150k-eval-v1.json",
+    script_dir / "150k-straight-v1.json",
 ]
 
 validation_results = []
@@ -140,7 +141,7 @@ results_json = {
     "results": validation_results
 }
 
-Path("antigravity/agent/configs/validation-results.json").write_text(
+(script_dir / "validation-results.json").write_text(
     json.dumps(results_json, indent=2),
     encoding='utf-8'
 )
@@ -160,7 +161,7 @@ else:
                 error_lines.append(f"  - {error}\n")
             error_lines.append("\n")
     
-    Path("antigravity/agent/configs/validation-errors.txt").write_text(
+    (script_dir / "validation-errors.txt").write_text(
         "".join(error_lines),
         encoding='utf-8'
     )

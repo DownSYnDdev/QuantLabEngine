@@ -7,15 +7,16 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Config files to simulate
+script_dir = Path(__file__).parent
 config_files = [
-    "antigravity/agent/configs/25k-eval-v1.json",
-    "antigravity/agent/configs/25k-straight-v1.json",
-    "antigravity/agent/configs/50k-eval-v1.json",
-    "antigravity/agent/configs/50k-straight-v1.json",
-    "antigravity/agent/configs/100k-eval-v1.json",
-    "antigravity/agent/configs/100k-straight-v1.json",
-    "antigravity/agent/configs/150k-eval-v1.json",
-    "antigravity/agent/configs/150k-straight-v1.json",
+    script_dir / "25k-eval-v1.json",
+    script_dir / "25k-straight-v1.json",
+    script_dir / "50k-eval-v1.json",
+    script_dir / "50k-straight-v1.json",
+    script_dir / "100k-eval-v1.json",
+    script_dir / "100k-straight-v1.json",
+    script_dir / "150k-eval-v1.json",
+    script_dir / "150k-straight-v1.json",
 ]
 
 def simulate_config_provisioning(config_data, config_name):
@@ -187,7 +188,7 @@ output = {
     "results": simulation_results
 }
 
-Path("antigravity/agent/configs/simulation-results.json").write_text(
+(script_dir / "simulation-results.json").write_text(
     json.dumps(output, indent=2),
     encoding='utf-8'
 )
