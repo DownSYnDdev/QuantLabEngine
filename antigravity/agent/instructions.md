@@ -35,6 +35,7 @@ Before executing any milestone, the agent must read and understand:
 - agent/milestone5.md
 - agent/milestone6.md
 - agent/milestone7.md
+- agent/milestone8.md
 
 ## Library Documentation References
 ### Charting & Visualization
@@ -65,6 +66,10 @@ Before executing any milestone, the agent must read and understand:
 - agent/docs/account-schema.md
 - agent/docs/sample-account-configs.md
 - agent/docs/propfirm-model.md
+- agent/docs/provisioning-api.md
+- agent/docs/event-contracts.md
+- agent/docs/webhook-bots.md
+- agent/docs/tenant-config.md
 
 ### Account Configurations
 - agent/configs/25k-eval-v1.json
