@@ -117,11 +117,8 @@ All of these are represented as JSON configs that conform to `agent/docs/account
     - Account config (matching the schema).
     - User-to-account mapping.
 
-- **Handle payouts**:
-  - Receive events from QuantLab (e.g., `payout.eligible`).
-  - Run additional checks (KYC, fraud, compliance).
-  - Approve, reject, or adjust payouts.
-  - Record payouts in the business ledger.
+- **Business decisions and payouts**:
+  - QuantLab is a simulated execution and enforcement engine. Payouts, billing, KYC, and business decisions are the responsibility of the propfirm website. QuantLab exposes APIs and events for the website to consume for payout eligibility and reconciliation.
 
 - **User-facing flows**:
   - Account purchase and upgrades.
@@ -129,6 +126,8 @@ All of these are represented as JSON configs that conform to `agent/docs/account
   - Support and dispute resolution.
 
 ### QuantLab responsibilities
+
+QuantLab is a simulated execution and enforcement engine. Payouts, billing, KYC, and business decisions are the responsibility of the propfirm website. QuantLab exposes APIs and events for the website to consume for payout eligibility and reconciliation.
 
 - **Simulated trading environment**:
   - Real-time data.

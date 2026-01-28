@@ -91,15 +91,30 @@ QuantLab is a web-based financial charting, analysis, and algorithmic trading pl
 - Sorting and grouping.
 - Multi-symbol monitoring.
 
-### 3.7 PropFirm Account Management
-- Config-driven account types and challenge definitions.
-- Individual account configs provisioned: 25k, 50k, 100k, 150k (eval + straight-to-funded).
-- Schema-validated configurations for:
-  - Two challenge variants: Evaluation path and Straight-to-Funded
-  - Profit targets, drawdown limits, daily loss limits
-  - Trading rules and consistency requirements
-  - Staged payout rules and escrow policies
-- Runtime constraint enforcement based on provisioned configs.
+### 3.7 White-Label Integration
+
+QuantLab provides a clean separation between the **simulated trading platform** and the **propfirm business system**:
+
+- **QuantLab provides**: simulated execution, rule enforcement, audit logs, event emission, and APIs for the website to consume.
+- **QuantLab does not provide**: payouts, billing, KYC, dispute resolution, or live order execution.
+
+#### Webhook Bot Execution
+- Authenticated webhook receiver for incoming trading signals.
+- Validates payload schema and signature.
+- Maps signals to account context and simulates trade execution.
+- Emits `webhook.received`, `webhook.validated`, `webhook.trade_executed` events.
+
+#### Rule Enforcement Engine
+- Loads runtime constraints from provisioned account configs.
+- Evaluates rules on every simulated fill and periodic checkpoints.
+- Emits `rule.violation.*` events when constraints are breached.
+- Writes violations to immutable audit logs.
+
+#### Multi-Tenant Support
+- All data namespaced by `tenantId` with complete isolation.
+- Tenant-specific account configs with versioning support.
+- Secure storage of tenant secrets and webhook credentials.
+- Per-tenant provisioning and configuration management APIs.
 
 ### 3.8 UI/UX
 - Modern, responsive interface.
@@ -164,6 +179,7 @@ QuantLab is a web-based financial charting, analysis, and algorithmic trading pl
 5. **Milestone 5 — Tick‑Level Backtesting Engine**  
 6. **Milestone 6 — User Accounts, Saved Layouts & Persistence**  
 7. **Milestone 7 — Cloud Deployment, Scaling & Monitoring**
+8. **Milestone 8 — White-Label PropFirm Integration Layer**
 
 ## 7. Acceptance Criteria
 - DSL supports both indicators and strategies.

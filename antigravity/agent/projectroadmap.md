@@ -3,6 +3,9 @@
 ## Overview
 This roadmap outlines the full development sequence for QuantLab, from initial scaffolding to cloud deployment. Each milestone builds on the previous one and corresponds directly to the milestone files in the /agent folder.
 
+> [!IMPORTANT]
+> All milestones assume QuantLab provides simulated execution only; business logic and payouts are external.
+
 ---
 
 ## Phase 1 — Foundation & Core Engine
@@ -64,12 +67,15 @@ This roadmap outlines the full development sequence for QuantLab, from initial s
 
 ## Phase 5 — PropFirm Challenge System
 
-### Milestone 8 — PropFirm Account Types & Challenge Engine
-- Implement config-driven account type system.
-- Individual account configs provisioned: 25k, 50k, 100k, 150k (eval + straight-to-funded).
-- Build challenge evaluation engine with runtime constraint enforcement.
-- Add payout calculator and escrow policy management.
-- Integrate account provisioning API for tenant-specific configs.
+### Milestone 8 — White-Label PropFirm Integration Layer
+- Implement clean integration layer for white-label licensing to propfirms.
+- Build Provisioning API for tenant account configs and user→account mapping.
+- Create Rule Enforcement Engine enforcing runtime constraints from configs.
+- Implement Webhook Bot Execution Pipeline for simulated trade execution.
+- Add Audit Logging System with tenant-namespaced logs and query API.
+- Define Event Contracts for challenge milestones, violations, and webhooks.
+- Full multi-tenant support with namespacing and secrets management.
+- See [milestone8.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/milestone8.md) for full details.
 
 ---
 
