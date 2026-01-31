@@ -33,6 +33,16 @@ Use this JSON Schema to validate account type and challenge configuration before
     "currency": { "type": "string", "default": "USD" },
     "variant": { "type": "string", "enum": ["straight-to-funded", "evaluation"] },
     "tenantId": { "type": "string" },
+    "webhookSecret": { "type": "string" },
+    "allowedInstruments": { 
+      "type": "array", 
+      "items": { "type": "string" } 
+    },
+    "ruleEngineVersion": { "type": "string" },
+    "auditLogRetention": { 
+      "type": "integer", 
+      "description": "Number of days to retain audit logs" 
+    },
     "challengeDefinitions": {
       "type": "array",
       "items": {

@@ -1,0 +1,12 @@
+{
+    "name": "check-instrument-allowed",
+    "description": "Checks if the requested instrument is in the allowlist for this account.",
+    "parameters": {
+        "symbol": "string",
+        "allowedInstruments": "array<string>"
+    },
+    "returns": {
+        "violation": "boolean",
+        "detail": "string"
+    }
+}

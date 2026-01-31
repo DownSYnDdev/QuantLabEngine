@@ -1,0 +1,35 @@
+{
+    "id": "tenant-demo-25k",
+    "displayName": "Tenant A 25k Evaluation",
+    "baseCapital": 25000,
+    "variant": "evaluation",
+    "tenantId": "tenantA",
+    "webhookSecret": "sec_tenantA_12345",
+    "allowedInstruments": [
+        "EURUSD",
+        "GBPUSD",
+        "XAUUSD"
+    ],
+    "ruleEngineVersion": "1.0.0",
+    "auditLogRetention": 90,
+    "challengeDefinitions": [
+        {
+            "id": "phase1",
+            "name": "Evaluation Phase 1",
+            "rules": {
+                "profitTarget": 2500,
+                "maxDrawdown": 1500,
+                "dailyLossLimit": 1000,
+                "minTradingDays": 5
+            }
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [],
+        "partialPayoutAllowed": false
+    },
+    "meta": {
+        "version": "1.0.0",
+        "createdBy": "system"
+    }
+}

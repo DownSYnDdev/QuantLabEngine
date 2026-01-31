@@ -101,6 +101,14 @@ Transform the DSL from a basic parser into a fully functional scripting language
 
 ---
 
+---
+
+### 7. Tenant Data Isolation
+- Ensure all symbol data requests include `tenantId`.
+- Validate that the accessed symbol is in the tenant's `allowedInstruments` list (from `tenant-config.md`).
+
+---
+
 ## Deliverables
 - Complete DSL grammar
 - Full AST implementation
@@ -109,7 +117,9 @@ Transform the DSL from a basic parser into a fully functional scripting language
 - Event‑driven runtime
 - Built‑in indicator and series functions
 - Chart integration for DSL‑generated overlays
+- Chart integration for DSL‑generated overlays
 - Strategy output hooks
+- Tenant-scoped data access
 
 ---
 
@@ -119,7 +129,9 @@ Transform the DSL from a basic parser into a fully functional scripting language
 - Interpreter enforces CPU, memory, and loop safety
 - DSL can produce overlays and strategy signals
 - Errors are clear, descriptive, and non‑fatal
+- Errors are clear, descriptive, and non‑fatal
 - Chart updates reflect DSL output in real time
+- Data access obeys `tenantId` scope
 
 ---
 

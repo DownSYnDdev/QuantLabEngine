@@ -77,6 +77,12 @@ Extend the charting engine with indicator and overlay support, implement the fir
 
 ---
 
+### 6. Rule Engine Integration
+- Ensure `OHLCV` structures are compatible with Rule Engine checks.
+- Add `Equity` and `FloatingPL` fields to the data feed model to support rule validation.
+
+---
+
 ## Deliverables
 - Fully functional indicator engine
 - Overlay rendering system integrated with chart
@@ -84,6 +90,7 @@ Extend the charting engine with indicator and overlay support, implement the fir
 - Stub interpreter capable of producing indicator values
 - DSL‑driven overlays rendered on chart
 - Indicator manager UI
+- Rule-compatible data models
 
 ---
 
@@ -93,6 +100,7 @@ Extend the charting engine with indicator and overlay support, implement the fir
 - AST and interpreter handle basic expressions without errors
 - Chart overlays reflect DSL output in real time
 - UI allows adding/removing/configuring indicators
+- Data models support `rule-engine.md` requirements
 
 ---
 

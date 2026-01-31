@@ -1,0 +1,13 @@
+{
+    "name": "check-drawdown",
+    "description": "Checks if the account equity has breached the max trailing drawdown.",
+    "parameters": {
+        "currentEquity": "number",
+        "highWaterMark": "number",
+        "trailingDrawdownLimit": "number"
+    },
+    "returns": {
+        "violation": "boolean",
+        "detail": "string"
+    }
+}

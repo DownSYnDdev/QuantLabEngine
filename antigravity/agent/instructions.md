@@ -84,4 +84,9 @@ Before executing any milestone, the agent must read and understand:
 - agent/configs/100k-straight-v1.json
 - agent/configs/150k-eval-v1.json
 - agent/configs/150k-straight-v1.json
+- agent/configs/tenant-aware-config.json
+- agent/configs/versioned-config-v1.json
+- agent/configs/versioned-config-v2.json
+- agent/configs/base-config.json
+- agent/configs/inherited-config.json
 

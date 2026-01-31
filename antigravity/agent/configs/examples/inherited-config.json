@@ -1,0 +1,28 @@
+{
+    "id": "inherited-50k-tenantC",
+    "displayName": "Tenant C 50k (Inherited)",
+    "baseCapital": 50000,
+    "variant": "evaluation",
+    "tenantId": "tenantC",
+    "parentConfigId": "base-50k",
+    "webhookSecret": "sec_tenantC_999",
+    "challengeDefinitions": [
+        {
+            "id": "phase1",
+            "name": "Global Phase 1",
+            "rules": {
+                "maxDrawdown": 3000,
+                "dailyLossLimit": 1500,
+                "profitTarget": 3000
+            }
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [],
+        "partialPayoutAllowed": true
+    },
+    "meta": {
+        "version": "1.0.0",
+        "inheritanceType": "merge"
+    }
+}

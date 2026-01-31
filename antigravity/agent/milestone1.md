@@ -41,18 +41,25 @@ Establish the foundational structure of the QuantLab platform and implement the 
 - Add basic navigation and settings panel
 - Prepare DSL editor component (syntax highlighting only)
 
+### 6. Tenant & Config Awareness
+- Ensure frontend loads configuration from `configId` parameter.
+- Validate `tenantId` in initial API calls.
+- Apply tenant branding (logo, colors) to the UI scaffold.
+
 ## Deliverables
 - Working frontend and backend scaffolds
 - OHLCV schema and mock data
 - Functional charting engine with candlestick rendering
 - DSL hook for `on_bar(symbol)` overlays
 - Responsive UI layout
+- Tenant-aware context loading
 
 ## Acceptance Criteria
 - Chart renders OHLCV data at 60 FPS
 - Zoom and pan interactions work smoothly
 - DSL hook returns overlay data without errors
 - Project structure is modular and ready for expansion
+- UI matches the tenant's branding configuration from `tenant-config.md`
 - All code is written into `/workspace` and documented
 
 ## Notes

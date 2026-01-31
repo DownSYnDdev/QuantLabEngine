@@ -109,6 +109,15 @@ Implement a fully functional order engine that supports realistic trading operat
 
 ---
 
+---
+
+### 7. Webhook & Rule Integration
+- Implement `webhook-bots.md` signal ingestion into the order queue.
+- Validate all incoming orders against `rule-engine.md` before execution.
+- Reject orders that violate constraints (e.g., restricted symbols, max daily loss).
+
+---
+
 ## Deliverables
 - Fully functional order engine
 - Fill logic with slippage and partial fills
@@ -116,7 +125,10 @@ Implement a fully functional order engine that supports realistic trading operat
 - DSL functions for order placement and portfolio access
 - Event‑driven strategy execution pipeline
 - Chart overlays for orders and positions
+- Chart overlays for orders and positions
 - Strategy panel UI
+- Webhook signal integration
+- Rule-validated order flow
 
 ---
 
@@ -128,6 +140,8 @@ Implement a fully functional order engine that supports realistic trading operat
 - Positions and PnL update in real time
 - No unsafe or infinite loops in strategy execution
 - Order engine integrates cleanly with DSL interpreter
+- Webhook signals trigger valid orders
+- Rules enforce limits (e.g., daily loss) correctly
 
 ---
 

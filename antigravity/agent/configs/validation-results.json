@@ -1,10 +1,30 @@
 {
   "timestamp": "2026-01-27T09:49:00-08:00",
   "schema_version": "draft-07",
-  "total_configs": 8,
-  "passed": 8,
+  "total_configs": 13,
+  "passed": 13,
   "failed": 0,
   "results": [
+    {
+      "file": "100k-eval-v1.json",
+      "status": "PASSED",
+      "errors": []
+    },
+    {
+      "file": "100k-straight-v1.json",
+      "status": "PASSED",
+      "errors": []
+    },
+    {
+      "file": "150k-eval-v1.json",
+      "status": "PASSED",
+      "errors": []
+    },
+    {
+      "file": "150k-straight-v1.json",
+      "status": "PASSED",
+      "errors": []
+    },
     {
       "file": "25k-eval-v1.json",
       "status": "PASSED",
@@ -26,22 +46,27 @@
       "errors": []
     },
     {
-      "file": "100k-eval-v1.json",
+      "file": "base-config.json",
       "status": "PASSED",
       "errors": []
     },
     {
-      "file": "100k-straight-v1.json",
+      "file": "inherited-config.json",
       "status": "PASSED",
       "errors": []
     },
     {
-      "file": "150k-eval-v1.json",
+      "file": "tenant-aware-config.json",
       "status": "PASSED",
       "errors": []
     },
     {
-      "file": "150k-straight-v1.json",
+      "file": "versioned-config-v1.json",
+      "status": "PASSED",
+      "errors": []
+    },
+    {
+      "file": "versioned-config-v2.json",
       "status": "PASSED",
       "errors": []
     }

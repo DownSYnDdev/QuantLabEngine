@@ -1,0 +1,25 @@
+{
+    "id": "base-50k",
+    "displayName": "Base 50k Template",
+    "baseCapital": 50000,
+    "variant": "evaluation",
+    "tenantId": "global",
+    "challengeDefinitions": [
+        {
+            "id": "phase1",
+            "name": "Global Phase 1",
+            "rules": {
+                "maxDrawdown": 2500,
+                "dailyLossLimit": 1500
+            }
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [],
+        "partialPayoutAllowed": false
+    },
+    "meta": {
+        "version": "1.0.0",
+        "isTemplate": true
+    }
+}

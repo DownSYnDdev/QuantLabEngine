@@ -1,49 +1,65 @@
-# Webhook Bots
+# Webhook Bot Execution Pipeline
+Version: 1.0.0
+Scope: Defines the end-to-end pipeline for processing trading signals received from external bots via webhooks.
 
-## Summary
+This document outlines the standard payload schema, authentication mechanism, validation logic, and execution steps.
 
-Webhook Bots enable propfirm websites to send trading signals to QuantLab for simulated execution on behalf of user accounts. The webhook pipeline receives authenticated signals, validates payload schemas and signatures, maps signals to account context, and executes simulated trades while emitting events for each stage. This system supports algobot marketplaces, third-party signal providers, and automated trading strategies while maintaining full audit trails and tenant isolation.
+## 1. Webhook Payload Schema
+**Endpoint**: `POST /webhooks/{tenantId}/{botId}`
 
-## TODO
+### Headers
+| Header | Description |
+| :--- | :--- |
+| `X-Bot-ID` | The unique ID of the registered bot. |
+| `X-Timestamp` | ISO 8601 UTC timestamp of the request. |
+| `X-Signature` | HMAC-SHA256 signature for authentication. |
 
-- [ ] Define webhook endpoint structure
-  - [ ] `POST /api/v1/webhooks/signals` for incoming trading signals
-  - [ ] Authentication mechanisms (HMAC signatures, API keys, JWT)
-  - [ ] Tenant-specific webhook secrets management
-- [ ] Document incoming signal payload schema
-  - [ ] Required fields: `tenantId`, `accountId`, `symbol`, `action` (buy/sell), `quantity`
-  - [ ] Optional fields: `orderType` (market/limit/stop), `price`, `stopLoss`, `takeProfit`
-  - [ ] Strategy metadata: `botId`, `strategyName`, `signalId`, `timestamp`
-- [ ] Document signature validation process
-  - [ ] HMAC-SHA256 signature generation and verification
-  - [ ] Timestamp validation to prevent replay attacks
-  - [ ] Nonce handling for idempotency
-- [ ] Document signal validation pipeline
-  - [ ] Schema validation against defined contracts
-  - [ ] Account existence and active status checks
-  - [ ] Account rule pre-checks (would this violate limits?)
-  - [ ] Tenant permission verification
-- [ ] Document simulated trade execution
-  - [ ] Mapping signals to order engine actions
-  - [ ] Position sizing and leverage constraints
-  - [ ] Simulated fill logic and slippage modeling
-  - [ ] Order confirmation and acknowledgment
-- [ ] Document event emission for webhook lifecycle
-  - [ ] `webhook.received` event
-  - [ ] `webhook.validated` event
-  - [ ] `webhook.trade_executed` event with fill details
-  - [ ] `webhook.failed` event with error details
-- [ ] Provide webhook registration API documentation
-  - [ ] How tenants register webhook URLs for callbacks
-  - [ ] Webhook secret rotation and management
-- [ ] Document rate limiting and abuse prevention
-  - [ ] Per-account, per-tenant, and per-bot rate limits
-  - [ ] Suspicious pattern detection
-- [ ] Provide example webhook payloads and integration guides
-- [ ] Document testing and sandbox environments for bot developers
+### JSON Body
+```json
+{
+  "accountId": "25k-eval-v1",
+  "symbol": "EURUSD",
+  "side": "buy",
+  "size": 1.0,
+  "price": 1.0842,
+  "signalId": "sig_550e8400-e29b",
+  "action": "open" 
+}
+```
+*Note: `action` triggers opening or closing logic.*
 
-## Related Documents
+## 2. Authentication
+**Mechanism**: HMAC-SHA256
+1. **Secret**: Tenant-specific or Bot-specific webhook secret (stored in `tenant-config` or `algobot-marketplace`).
+2. **String to Sign**: `timestamp + "." + raw_request_body`
+3. **Validation**: 
+   - Recompute signature.
+   - Compare with `X-Signature`.
+   - Reject if mismatch.
+   - Reject if `timestamp` is older than 60 seconds (Replay Protection).
 
-- [event-contracts.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/event-contracts.md) - Webhook delivery event schemas
-- [provisioning-api.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/provisioning-api.md) - Webhook URL registration endpoints
-- [tenant-config.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/tenant-config.md) - Tenant-specific webhook settings
+## 3. Rate Limits
+- **Per Bot**: 60 requests per minute.
+- **Per Tenant**: 1000 requests per minute.
+- **Action**: Return `429 Too Many Requests` if exceeded.
+
+## 4. Signal Validation
+Before execution, the pipeline validates:
+1. **Schema**: Fields (`symbol`, `side`, `size`, `accountId`) are present and correct types.
+2. **Account**: `accountId` belongs to `tenantId`.
+3. **Symbol**: `symbol` is in the account's `allowedInstruments` list.
+4. **Markets**: Markets are open (not weekend/holiday).
+
+## 5. Execution Pipeline
+1. **Receive**: Ingest raw request, log IP, emit `webhook.received`.
+2. **Authenticate**: Verify HMAC and Timestamp.
+3. **Validate**: Check schema and business logic (Rate limits, Account ownership).
+   - *If invalid*: Emit `webhook.rejected`, return 4xx.
+   - *If valid*: Emit `webhook.validated`.
+4. **Rule Engine Check**: Run all pre-trade rule checks (Daily Loss, Max Drawdown, etc.).
+   - *If violation*: Emit `webhook.rejected` (with reason), return 422.
+5. **Simulate**: 
+   - Calculate new equity/balance.
+   - Create execution record.
+   - Emit `webhook.trade_executed`.
+   - Return 200 OK.

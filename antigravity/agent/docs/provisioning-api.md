@@ -1,35 +1,56 @@
-# Provisioning API
+# Provisioning & Configuration API
+Version: 1.0.0
+Scope: Defines the workflow for creating accounts and managing their configurations.
 
-## Summary
+This API acts as the bridge between the Prop-Firm Website (Tenant) and the QuantLab Engine.
 
-The Provisioning API enables propfirm websites to programmatically create and manage tenant accounts in QuantLab. It provides endpoints for provisioning account configurations, mapping users to accounts, retrieving account state, and managing tenant-specific settings. All account configs must conform to the schema defined in `account-schema.md`, and the API enforces validation, versioning, and tenant isolation to ensure safe multi-tenant operation.
+## 1. Account Provisioning Flow
 
-## TODO
+### Step 1: Request
+The website sends a `POST /tenants/{tenantId}/accounts` request.
+**Required Fields:**
+- `userId`: The unique ID of the user on the website.
+- `configId`: The specific account configuration to use (e.g., `25k-eval-v1`).
+- `tenantId`: Must match the authenticated API key.
 
-- [ ] Define API authentication and authorization (API keys, JWT, OAuth2)
-- [ ] Document `POST /api/v1/tenants/{tenantId}/accounts` endpoint
-  - [ ] Request schema with account config validation
-  - [ ] Response schema with account ID and provisioning status
-  - [ ] Error responses and validation error formats
-- [ ] Document `GET /api/v1/tenants/{tenantId}/accounts/{accountId}` endpoint
-  - [ ] Response schema with full account state
-  - [ ] Include balance, PnL, open positions, rule statuses
-- [ ] Document `PUT /api/v1/tenants/{tenantId}/accounts/{accountId}` endpoint for updates
-- [ ] Document `DELETE /api/v1/tenants/{tenantId}/accounts/{accountId}` endpoint
-- [ ] Document user-to-account mapping endpoints
-  - [ ] `POST /api/v1/tenants/{tenantId}/users/{userId}/accounts/{accountId}/map`
-  - [ ] `GET /api/v1/tenants/{tenantId}/users/{userId}/accounts`
-- [ ] Document config versioning support
-  - [ ] How to specify config version in requests
-  - [ ] Version migration and backwards compatibility
-- [ ] Document rate limiting and quotas per tenant
-- [ ] Provide example requests and responses for common workflows
-- [ ] Document webhook URL registration for event callbacks
-- [ ] Add API reference with OpenAPI/Swagger spec
+### Step 2: Validation
+The system performs the following checks:
+1. **Tenant Check**: Is the tenant active?
+2. **Config Check**: Does `configId` exist and is it in the tenant's `allowedConfigs` list?
+3. **Capacity Check**: (Optional) Does the system have capacity for new accounts?
 
-## Related Documents
+### Step 3: Instantiation
+If valid:
+1. A new `AccountState` record is created in the database.
+2. Initial balance and rules are copied from the *current version* of the `configId`.
+3. An `account.provisioned` event is emitted.
 
-- [account-schema.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/account-schema.md) - Account configuration schema
-- [sample-account-configs.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/sample-account-configs.md) - Example account configurations
-- [tenant-config.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/tenant-config.md) - Tenant configuration guide
-- [propfirm-model.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/propfirm-model.md) - Platform responsibilities
+### Step 4: Response
+Returns the new `accountId` immediately. The account is ready to receive trades.
+
+## 2. Configuration Management
+
+### Validating Configs
+Before a tenant can use a new configuration, it must be validated.
+**Endpoint**: `POST /tenants/{tenantId}/configs/validate`
+**Process**:
+1. Website uploads the JSON config.
+2. System validates against `account-schema.md` (JSON Schema).
+3. System checks for logical errors (e.g., `dailyLoss` > `maxLoss`).
+4. Returns specific validation errors or "OK".
+
+### Uploading New Versions
+Tenants can update configurations without breaking existing accounts.
+**Endpoint**: `POST /tenants/{tenantId}/configs`
+**Process**:
+1. Website uploads verified config with `id: "25k-eval-v1"`.
+2. System detects this ID already exists.
+3. System creates a NEW internal version (e.g., v2) but keeps the ID stable OR requires a new ID (e.g., `25k-eval-v2`) depending on `versioningStrategy` in tenant config.
+   - *Recommended*: Use explicit versioning in IDs (`v2`) for clarity.
+4. Old accounts stay on their original config snapshot.
+5. New accounts use the new upload.
+
+## 3. Best Practices
+- **Idempotency**: Use `requestId` headers to prevent double-provisioning on retries.
+- **Async Handling**: Provisioning is fast, but heavy updates should rely on webhooks (`account.state_changed`) rather than polling.
+- **Isolation**: Tenants can NEVER see or modify another tenant's configs or accounts.

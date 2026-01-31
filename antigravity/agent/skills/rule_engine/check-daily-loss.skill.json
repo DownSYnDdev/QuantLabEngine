@@ -1,0 +1,12 @@
+{
+    "name": "check-daily-loss",
+    "description": "Checks if the account has exceeded the daily loss limit.",
+    "parameters": {
+        "currentDailyLoss": "number",
+        "dailyLossLimit": "number"
+    },
+    "returns": {
+        "violation": "boolean",
+        "detail": "string"
+    }
+}

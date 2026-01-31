@@ -1,154 +1,66 @@
-# Rule Enforcement Engine
+# QuantLab Rule Engine
+Version: 1.0.0
+Scope: Defines the logic, parameters, and enforcement mechanisms for all trading rules applied to prop-firm accounts.
 
-## Overview
+The Rule Engine is responsible for validating every trade and account state update against the active configuration.
 
-The Rule Enforcement Engine validates all trading activity against account-specific constraints defined in provisioned configs. Rules are evaluated on every simulated fill and at periodic checkpoints to ensure accounts comply with daily loss limits, max drawdown, consistency requirements, and minimum trading days.
+## 1. Daily Loss Limit
+**Logic**: Prevents a trader from losing more than a specific amount in a single trading day.
+- **Calculation**: `Current Daily Loss = Initial Equity at Start of Day - Current Equity`
+- **Trigger**: If `Current Daily Loss > config.dailyLossLimit`
+- **Action**: 
+    1. Close all open positions immediately.
+    2. Disable trading for the rest of the day (or permanently, depending on config).
+    3. Emit `rule.violation.daily_loss`.
 
-## Rule Types
+## 2. Max Total Loss (Max Drawdown)
+**Logic**: Prevents the account equity from ever falling below a fixed threshold.
+- **Calculation**: `Equity < (Initial Balance - config.maxLossLimit)`
+- **Trigger**: If `Equity < Hard Breach Level`
+- **Action**:
+    1. Liquidate Account.
+    2. Mark Account as `breached`.
+    3. Emit `rule.violation.max_loss`.
 
-### 1. Daily Loss Limit
-Maximum loss allowed in a single trading day.
+## 3. Max Trailing Drawdown
+**Logic**: A dynamic drawdown limit that trails the account's high-water mark (HWM) up to a certain point (usually the initial balance).
+- **Calculation**: `HWM = max(HWM, Current Equity)`. `Drawdown Limit = HWM - config.trailingDrawdownAmount`.
+- **Trigger**: If `Equity < Drawdown Limit`
+- **Action**:
+    1. Liquidate Account.
+    2. Mark Account as `breached`.
+    3. Emit `rule.violation.drawdown`.
 
-**Config Schema:**
-```json
-{
-  "dailyLossLimit": {
-    "enabled": true,
-    "value": 2000,
-    "currency": "USD",
-    "calculationMethod": "startOfDay"
-  }
-}
-```
+## 4. Minimum Trading Days
+**Logic**: Requires the trader to trade on a minimum number of unique days to be eligible for a payout or phase completion.
+- **Calculation**: Count of unique days where at least one trade was opened.
+- **Trigger**: Checked during `Payout Request` or `Phase Promotion`.
+- **Action**: Deny request if `Actual Days < config.minTradingDays`. Emit `rule.violation.min_days` (soft violation).
 
-**Evaluation:**
-- Triggered on every fill
-- Compares current day P&L against limit
-- Emits `rule.violation.daily_loss_limit` if breached
+## 5. Consistency Rules
+**Logic**: Prevents "gambler" behavior by ensuring no single day accounts for too much of the total profit, or requiring consistent trade volume.
+- **Profit Consistency**: `Max Profit Day / Total Profit < config.maxProfitDayPercent` (e.g., 30%).
+- **Lot Size Consistency**: Average lot size must be within a range.
+- **Trigger**: Checked during `Phase Promotion`.
+- **Action**: Deny promotion. Emit `rule.violation.consistency`.
 
-### 2. Max Drawdown
-Maximum cumulative loss from peak balance.
+## 6. Allowed Instruments
+**Logic**: Restricts trading to a specific whitelist of symbols (e.g., EURUSD, BTCUSD).
+- **Trigger**: Checked on `Order Placement` (Pre-trade).
+- **Action**: Reject Order. Emit `rule.violation.instrument`.
 
-**Config Schema:**
-```json
-{
-  "maxDrawdown": {
-    "enabled": true,
-    "value": 5000,
-    "currency": "USD",
-    "calculationType": "balance-based"
-  }
-}
-```
+## 7. Trading Hours (Weekend/Holiday)
+**Logic**: Forces positions to be closed before market close on Fridays or holidays.
+- **Trigger**: `Time > Market Close - config.closeBufferMinutes`
+- **Action**: 
+    1. Force close open positions.
+    2. Reject new orders.
+    3. Emit `rule.violation.trading_hours` (if attempted).
 
-**Evaluation:**
-- Triggered on every fill
-- Tracks highest balance achieved
-- Emits `rule.violation.max_drawdown` if breached
-
-### 3. Minimum Trading Days
-Required number of trading days before payout eligibility.
-
-**Config Schema:**
-```json
-{
-  "minTradingDays": {
-    "enabled": true,
-    "value": 5,
-    "definition": "days_with_at_least_one_trade"
-  }
-}
-```
-
-**Evaluation:**
-- Evaluated at milestone checkpoints
-- Counts unique calendar days with fills
-
-### 4. Consistency Rule
-Prevents single-day profits from exceeding a percentage of total profit.
-
-**Config Schema:**
-```json
-{
-  "consistencyRule": {
-    "enabled": true,
-    "maxSingleDayProfitPercent": 40,
-    "evaluationWindow": "entire_period"
-  }
-}
-```
-
-**Evaluation:**
-- Evaluated at milestone checkpoints
-- Ensures balanced profit distribution
-
-## Rule Engine Architecture
-
-```
-┌─────────────────┐
-│  Simulated Fill │
-└────────┬────────┘
-         │
-         ▼
-┌─────────────────────┐
-│  Rule Engine        │
-│  - Load config      │
-│  - Evaluate rules   │
-│  - Calculate state  │
-└────────┬────────────┘
-         │
-    ┌────┴────┐
-    │         │
-    ▼         ▼
-┌────────┐  ┌──────────────┐
-│ Pass   │  │ Violation    │
-└────────┘  └──────┬───────┘
-                   │
-                   ▼
-            ┌──────────────┐
-            │ Emit Event   │
-            │ Write Audit  │
-            └──────────────┘
-```
-
-## Event Emission
-
-When a rule is violated, the engine emits events:
-
-**Example Violation Event:**
-```json
-{
-  "eventId": "evt_abc123",
-  "eventType": "rule.violation.daily_loss_limit",
-  "tenantId": "tenant_001",
-  "accountId": "acc_50k_001",
-  "timestamp": "2026-01-28T14:30:00Z",
-  "payload": {
-    "ruleType": "dailyLossLimit",
-    "threshold": 2000,
-    "actualValue": 2150,
-    "currency": "USD",
-    "tradingDay": "2026-01-28",
-    "violatedAt": "2026-01-28T14:30:00Z"
-  }
-}
-```
-
-## Implementation Checklist
-
-- [ ] Load rules from account config at account creation
-- [ ] Hook into simulated fill pipeline
-- [ ] Implement rule evaluators for each rule type
-- [ ] Track account state (balance, peak, daily P&L, trading days)
-- [ ] Emit violation events via event bus
-- [ ] Write violations to audit log
-- [ ] Implement periodic checkpoint evaluations
-- [ ] Add rule configuration validation
-- [ ] Create unit tests for each rule type
-- [ ] Add integration tests for multi-rule scenarios
-
-## Related Documents
-
-- [account-schema.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/account-schema.md) - Rule configuration schema
-- [event-contracts.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/event-contracts.md) - Violation event schemas
-- [audit-log.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/audit-log.md) - Audit logging system
+## 8. News Filters (Optional)
+**Logic**: Restricts trading during high-impact news events.
+- **Trigger**: `Time within +/- config.newsBufferMinutes` of a High Impact Event.
+- **Action**: 
+    1. Reject new orders.
+    2. (Optional) Close specific positions.
+    3. Emit `rule.violation.news_event`.

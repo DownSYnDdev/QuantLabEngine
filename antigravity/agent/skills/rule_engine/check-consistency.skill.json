@@ -1,0 +1,13 @@
+{
+    "name": "check-consistency",
+    "description": "Checks if the trading history meets consistency requirements (e.g. max profit day percentage).",
+    "parameters": {
+        "totalProfit": "number",
+        "maxDayProfit": "number",
+        "allowedPercentage": "number"
+    },
+    "returns": {
+        "violation": "boolean",
+        "detail": "string"
+    }
+}

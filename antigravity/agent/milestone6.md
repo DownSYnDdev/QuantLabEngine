@@ -27,7 +27,17 @@ Implement the user system, authentication, saved layouts, saved indicators/strat
 
 ---
 
-### 3. Saved Layouts System
+---
+
+### 3. Tenant & Account Isolation
+- Schema design must support multi-tenancy:
+  - `users` table has `tenant_id` column.
+  - `projects` table has `tenant_id` and `user_id` columns.
+- Enforce Row-Level Security (RLS) or application-level checks to prevent cross-tenant data leakage.
+
+---
+
+### 4. Saved Layouts System
 - Implement layout schema:
   - Chart configuration
   - Indicators attached to each chart
@@ -111,6 +121,7 @@ Implement the user system, authentication, saved layouts, saved indicators/strat
 ## Deliverables
 - Fully functional authentication system
 - Persistent user profiles
+- Tenant-isolated database schema
 - Saved layouts with autosave support
 - Saved indicators and strategies
 - Watchlists with real‑time updates

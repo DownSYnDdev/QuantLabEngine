@@ -14,18 +14,18 @@ This roadmap outlines the full development sequence for QuantLab, from initial s
 - Set up project structure, frontend, backend, and charting engine.
 - Implement OHLCV schema, mock data, and basic WebGL/Canvas rendering.
 - Establish UI layout and DSL integration hooks.
+- **Integration**: Tenant-aware config loading.
 
 ### Milestone 2 — Indicator Engine, Overlays & DSL Scaffolding
 - Build modular indicator engine (SMA, EMA, RSI, MACD, Bollinger).
 - Add overlay rendering system.
 - Implement DSL tokenizer, parser, and AST generator.
-- Connect DSL output to chart overlays.
+- **Integration**: Rule-compatible data models.
 
 ### Milestone 3 — Full DSL Interpreter, Multi‑Symbol Support & Event System
 - Complete DSL grammar and AST.
 - Implement interpreter runtime, safety limits, and error handling.
-- Add multi‑symbol execution and event-driven model.
-- Integrate interpreter with chart and strategy outputs.
+- **Integration**: Tenant-scoped symbol access.
 
 ---
 
@@ -33,15 +33,13 @@ This roadmap outlines the full development sequence for QuantLab, from initial s
 
 ### Milestone 4 — Order Engine, Portfolio State & Strategy Execution
 - Implement market, limit, stop, OCO, and bracket orders.
-- Add fill logic, slippage, and partial fills.
 - Build portfolio and position management.
-- Connect DSL functions to order engine and event callbacks.
+- **Integration**: Webhook signal ingestion & Rule-validated order flow.
 
 ### Milestone 5 — Tick‑Level Backtesting Engine
 - Implement deterministic simulation loop.
 - Add tick and bar data loaders with caching.
-- Integrate order engine and portfolio system into backtester.
-- Provide performance metrics, equity curves, and trade visualization.
+- **Integration**: Simulation stops on Rule Violations (e.g., Max Loss).
 
 ---
 
@@ -49,9 +47,8 @@ This roadmap outlines the full development sequence for QuantLab, from initial s
 
 ### Milestone 6 — User Accounts, Saved Layouts & Persistence
 - Implement authentication (JWT/OAuth2).
-- Add saved layouts, saved indicators, saved strategies, and watchlists.
-- Integrate PostgreSQL + Redis.
-- Build UI for managing user data and preferences.
+- Add saved layouts, saved indicators, saved strategies.
+- **Integration**: Tenant-isolated database schema.
 
 ---
 
@@ -60,47 +57,23 @@ This roadmap outlines the full development sequence for QuantLab, from initial s
 ### Milestone 7 — Cloud Deployment, Scaling & Monitoring
 - Containerize all services with Docker.
 - Deploy to Kubernetes with autoscaling.
-- Add API gateway, SSL, CI/CD, logging, metrics, and alerting.
-- Configure production database, caching, and environment variables.
+- **Integration**: Deploy Custom Rule Executor service.
 
 ---
 
 ## Phase 5 — PropFirm Challenge System
 
-### Milestone 8 — White-Label PropFirm Integration Layer
-- Implement clean integration layer for white-label licensing to propfirms.
-- Build Provisioning API for tenant account configs and user→account mapping.
-- Create Rule Enforcement Engine enforcing runtime constraints from configs.
-- Implement Webhook Bot Execution Pipeline for simulated trade execution.
-- Add Audit Logging System with tenant-namespaced logs and query API.
-- Define Event Contracts for challenge milestones, violations, and webhooks.
-- Full multi-tenant support with namespacing and secrets management.
-- See [milestone8.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/milestone8.md) for full details.
+### Milestone 8 — White-Label Prop-Firm Integration Layer
+**The Unification Layer**
+- **Account Provisioning**: API for creating accounts from defined schemas.
+- **Rule Engine**: Real-time enforcement of Drawdown, Daily Loss, and Consistency rules.
+- **Webhook Bots**: Secure pipeline for executing trades from external algo sources.
+- **Audit Logging**: Immutable, tenant-scoped record of every event.
+- **Multi-Tenancy**: Full logical isolation of data and configuration.
 
 ---
 
-## Optional Future Milestones (Post‑Launch)
-
-### Milestone 9 — Marketplace (Optional)
-- User‑shared indicators and strategies.
-- Rating system, tagging, and discovery.
-
-### Milestone 9 — Social Features (Optional)
-- Public profiles.
-- Strategy sharing.
-- Commenting and collaboration.
-
-### Milestone 10 — Broker Integration (Optional)
-- Paper trading first.
-- Real broker APIs (Alpaca, Interactive Brokers, etc.).
-
-### Milestone 11 — Mobile App (Optional)
-- iOS/Android companion app.
-- Real-time alerts and charting.
-
----
-
-## Notes
-- This roadmap is intentionally modular so the agent can work milestone-by-milestone.
-- Each milestone corresponds to a dedicated milestoneX.md file for detailed execution.
-- The roadmap should remain stable unless new features are added to the PRD.
+## Future Milestones (Post-Launch)
+- **Marketplace**: Sharing community indicators.
+- **Social**: User profiles and commenting.
+- **Broker Integration**: Live trading support (e.g., Alpaca).

@@ -115,6 +115,15 @@ Build a high‑performance, deterministic backtesting engine capable of simulati
 
 ---
 
+---
+
+### 8. Rule Engine Integration
+- Simulate rule checks on every tick/bar (Daily Loss, Max Loss).
+- Track "Rule Violation" events in the backtest result.
+- Stop simulation immediately upon hard breach (e.g., Max Loss).
+
+---
+
 ## Deliverables
 - Fully functional tick‑level backtesting engine
 - Historical data loader with caching
@@ -122,7 +131,9 @@ Build a high‑performance, deterministic backtesting engine capable of simulati
 - Integrated order engine and portfolio system
 - DSL‑driven strategy execution in backtest mode
 - Performance metrics and results visualization
+- Performance metrics and results visualization
 - Backtest configuration UI
+- Rule violation reports
 
 ---
 
@@ -130,7 +141,9 @@ Build a high‑performance, deterministic backtesting engine capable of simulati
 - Backtests run deterministically with identical inputs
 - Strategies can place orders and receive fills during simulation
 - Portfolio state updates correctly on every tick
+- Portfolio state updates correctly on every tick
 - Performance metrics are accurate and consistent
+- Rule violations are correctly detected and reported
 - UI displays equity curve, drawdown, trades, and metrics
 - Backtests complete within reasonable time (e.g., 1M ticks < 2 seconds on modern hardware)
 

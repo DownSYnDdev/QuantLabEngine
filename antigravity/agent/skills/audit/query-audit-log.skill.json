@@ -1,0 +1,19 @@
+{
+    "name": "query-audit-log",
+    "description": "Retrieves audit logs based on filters and pagination.",
+    "parameters": {
+        "tenantId": "string",
+        "accountId": "string",
+        "filters": {
+            "eventType": "string",
+            "startTime": "string",
+            "endTime": "string"
+        },
+        "limit": "integer",
+        "cursor": "string"
+    },
+    "returns": {
+        "logs": "array<object>",
+        "nextCursor": "string"
+    }
+}

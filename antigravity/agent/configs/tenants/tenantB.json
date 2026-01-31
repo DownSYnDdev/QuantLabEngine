@@ -1,0 +1,22 @@
+{
+    "id": "tenantB",
+    "name": "Beta Traders",
+    "domain": "app.betatraders.io",
+    "branding": {
+        "logoUrl": "https://betatraders.io/images/brand/logo_dark.svg",
+        "primaryColor": "#D0312D",
+        "secondaryColor": "#000000"
+    },
+    "allowedConfigs": [
+        "25k-straight-v1",
+        "50k-straight-v1",
+        "150k-straight-v1"
+    ],
+    "webhookSecret": "whsec_beta_9z8y7x6w5v4u3t2s1r0q",
+    "apiKeys": {
+        "paymentProvider": "pk_test_beta_stripe_key",
+        "emailService": "SG.beta_key"
+    },
+    "dataProvider": "binance",
+    "brokerId": "bridge_beta_02"
+}

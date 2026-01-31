@@ -1,192 +1,83 @@
 # Product Requirements Document (PRD)
-## Project: QuantLab — TradingView‑Like Platform with Algo‑Ready DSL
+## Project: QuantLab — White-Label Prop-Firm Trading Engine
 
 ## 1. Overview
-QuantLab is a web-based financial charting, analysis, and algorithmic trading platform inspired by TradingView but designed without its limitations. The system includes real-time data streaming, high-performance charting, technical indicators, a custom scripting language, user accounts, watchlists, and cloud-saved layouts. Unlike Pine Script, the DSL must support both indicator creation and full algorithmic trading logic, including realistic backtesting and event-driven execution.
+QuantLab is a high-performance, chart-centric simulated trading platform designed to be white-labeled by proprietary trading firms. It provides a "TradingView-like" experience for traders while offering a robust backend for firms to manage evaluation accounts, enforce trading rules, and ingest algorithmic signals via webhooks.
 
 ## 2. Goals
-- Deliver a TradingView-class charting platform with real-time data.
-- Provide a modern DSL that supports:
-  - indicator creation
-  - strategy creation
-  - algorithmic trading
-  - multi-symbol logic
-  - event-driven execution
-  - tick-level backtesting
-- Ensure the DSL is safe, sandboxed, and optimized for performance.
-- Provide a scalable backend and cloud-deployable architecture.
+- **Trader Experience**: A premium, responsive charting and manual trading interface.
+- **Prop-Firm Backend**: A secure, multi-tenant engine for account provisioning and rule enforcement.
+- **Algo Integration**: Seamless support for external bots via secure webhooks.
+- **Safety**: Strict isolation between tenants and immutable audit logging for all events.
 
 ## 3. Core Features
 
 ### 3.1 Real-Time Market Data
-- WebSocket-based streaming.
-- Tick-level updates.
-- Efficient batching and throttling.
+- WebSocket-based streaming (tick-level).
 - Multi-symbol subscriptions.
+- Efficient batching for high-frequency updates.
 
 ### 3.2 Charting Engine
-- WebGL or Canvas rendering.
-- Smooth zoom/pan/crosshair.
-- Multi-chart layouts.
-- Indicator overlays.
-- Customizable themes.
+- Professional-grade rendering (WebGL/Canvas).
+- Multi-chart layouts & synchronized crosshairs.
+- 50+ Built-in indicators (RSI, MACD, etc.).
+- Custom DSL for user-defined indicators.
 
-### 3.3 Technical Indicators
-- Built-in indicators (RSI, MACD, EMA, Bollinger Bands, etc.).
-- Modular indicator engine.
-- Indicators must be callable from the DSL.
+### 3.3 Trading Engine (Simulated)
+- **Order Types**: Market, Limit, Stop, Stop-Limit, OCO, Bracket.
+- **Execution Modeling**: Configurable slippage, partial fills, and latency.
+- **Position Management**: Real-time equity, margin, and PnL tracking.
 
-### 3.4 Custom DSL (Indicator + Algo Trading Language)
+### 3.4 White-Label Prop-Firm Integration
+This is the core differentiator. QuantLab acts as the diverse execution layer for multiple prop firms.
 
-#### Syntax & Structure
-- Simple, readable, Pine-inspired but not Pine-compatible.
-- Supports variables, arrays, dictionaries, and custom functions.
-- Supports multi-symbol references.
+#### A. Multi-Tenant Architecture
+- **Isolation**: strict data separation by `tenantId`.
+- **Configuration**: Tenant-specific JSON configs for branding, assets, and rules.
+- **Secrets**: Secure storage for per-tenant webhook keys and API credentials.
 
-#### Execution Model
-- Supports bar-based execution (indicator mode).
-- Supports event-driven execution (strategy mode).
+#### B. Account Provisioning API
+- **Endpoint**: `POST /tenants/{tenantId}/accounts`
+- **Schema**: Validates against `account-schema.md`.
+- **Versioning**: Supports upgrading configs without breaking active accounts.
 
-#### Event Types
-- on_bar(symbol)
-- on_tick(symbol)
-- on_order_fill(order)
-- on_position_change(position)
-- on_start()
-- on_end()
+#### C. Rule Enforcement Engine
+- **Runtime Checks**: Monitors Equity, Drawdown, Daily Loss on every tick.
+- **Violations**: Emits `rule.violation` events immediately upon breach.
+- **Configuration**: Rules are defined in the JSON account config, not hardcoded.
 
-#### Trading Engine Integration
-- Market, limit, stop, OCO, and bracket orders.
-- Slippage modeling.
-- Partial fills.
-- Position sizing.
-- Portfolio-level state.
+#### D. Webhook Bot Pipeline
+- **Ingestion**: Authenticated endpoint for Algo signals (`POST /webhooks/signals`).
+- **Validation**: HMAC signature verification + timestamp replay protection.
+- **Execution**: Converts valid signals into internal simulated orders.
 
-#### Backtesting
-- Tick-accurate simulation.
-- Bar-based fallback mode.
-- Multi-symbol backtesting.
-- Deterministic execution.
-
-#### Safety & Sandboxing
-- No access to filesystem, network, or OS.
-- CPU and memory limits.
-- Infinite loop protection.
-- Timeouts.
-
-#### Error Handling
-- Clear syntax errors.
-- Runtime error messages.
-- Debugging tools (logs, prints, variable inspection).
-
-### 3.5 User Accounts & Persistence
-- Authentication.
-- Saved layouts.
-- Saved indicators.
-- Saved strategies.
-- Watchlists.
-
-### 3.6 Watchlists
-- Real-time updates.
-- Sorting and grouping.
-- Multi-symbol monitoring.
-
-### 3.7 White-Label Integration
-
-QuantLab provides a clean separation between the **simulated trading platform** and the **propfirm business system**:
-
-- **QuantLab provides**: simulated execution, rule enforcement, audit logs, event emission, and APIs for the website to consume.
-- **QuantLab does not provide**: payouts, billing, KYC, dispute resolution, or live order execution.
-
-#### Webhook Bot Execution
-- Authenticated webhook receiver for incoming trading signals.
-- Validates payload schema and signature.
-- Maps signals to account context and simulates trade execution.
-- Emits `webhook.received`, `webhook.validated`, `webhook.trade_executed` events.
-
-#### Rule Enforcement Engine
-- Loads runtime constraints from provisioned account configs.
-- Evaluates rules on every simulated fill and periodic checkpoints.
-- Emits `rule.violation.*` events when constraints are breached.
-- Writes violations to immutable audit logs.
-
-#### Multi-Tenant Support
-- All data namespaced by `tenantId` with complete isolation.
-- Tenant-specific account configs with versioning support.
-- Secure storage of tenant secrets and webhook credentials.
-- Per-tenant provisioning and configuration management APIs.
-
-### 3.8 UI/UX
-- Modern, responsive interface.
-- Draggable panels.
-- Indicator/strategy manager.
-- DSL editor with syntax highlighting.
+#### E. Audit Logging
+- **Immutability**: Write-once, read-many logs for all trade and rule events.
+- **Querying**: Tenant-scoped API for dispute resolution.
 
 ## 4. Non-Functional Requirements
+- **Performance**: <100ms simulator latency, 60fps charting.
+- **Scalability**: Horizontal scaling of simulator nodes (stateless design).
+- **Security**: Zero access to host OS from DSL or Webhooks.
 
-### 4.1 Performance
-- 60 FPS chart rendering.
-- <100ms real-time update latency.
-- Efficient DSL execution.
-
-### 4.2 Security
-- Sandboxed DSL.
-- Input validation.
-- Secure authentication.
-- Rate limiting.
-
-### 4.3 Reliability
-- Auto-reconnect for WebSockets.
-- Graceful degradation.
-- Fault-tolerant backtesting engine.
-
-### 4.4 Scalability
-- Stateless backend services.
-- Containerized deployment.
-- CDN for static assets.
-
-## 5. Technical Requirements
-
-### Frontend
-- React or Next.js
-- WebGL/Canvas rendering
-- WebSocket client
-- DSL editor
-
-### Backend
-- Node.js or Python
-- REST + WebSocket APIs
-- DSL interpreter engine
-- Backtesting engine
-
-### Database
-- PostgreSQL
-- Redis
-- Optional: TimescaleDB
-
-### Infrastructure
-- Docker
-- Kubernetes
-- CI/CD
-- Logging & monitoring
+## 5. Technology Stack
+- **Frontend**: Next.js, WebGL/Canvas, WebSocket.
+- **Backend**: Node.js/Python (Event Loop architecture).
+- **Data**: PostgreSQL (Persistence), Redis (Hot State/PubSub).
+- **Infra**: Docker, Kubernetes.
 
 ## 6. Milestones
-
-1. **Milestone 1 — Project Scaffolding & Core Charting**  
-2. **Milestone 2 — Indicator Engine, Overlays & DSL Scaffolding**  
-3. **Milestone 3 — Full DSL Interpreter, Multi‑Symbol Support & Event System**  
-4. **Milestone 4 — Order Engine, Portfolio State & Strategy Execution**  
-5. **Milestone 5 — Tick‑Level Backtesting Engine**  
-6. **Milestone 6 — User Accounts, Saved Layouts & Persistence**  
-7. **Milestone 7 — Cloud Deployment, Scaling & Monitoring**
-8. **Milestone 8 — White-Label PropFirm Integration Layer**
+1. **Foundation & Charting**: Core UI and Data feed.
+2. **Indicators & DSL**: Custom script support.
+3. **DSL Interpreter**: Event-driven script execution.
+4. **Order Engine**: Simulated execution & Portfolio state.
+5. **Backtesting**: Historic simulation.
+6. **User System**: Auth & Persistence.
+7. **Cloud Deployment**: Production infra.
+8. **White-Label Integration**: Multi-tenancy, Rules, Webhooks, Audit.
 
 ## 7. Acceptance Criteria
-- DSL supports both indicators and strategies.
-- DSL supports event-driven execution.
-- Backtesting is tick-accurate.
-- Multi-symbol strategies work.
-- DSL is fully sandboxed.
-- Charts render at 60 FPS.
-- Real-time updates <100ms.
-- Platform deploys to cloud. 
+- System supports multiple distinct tenants with unique branding.
+- Rule engine correctly fails accounts upon simulated breaches.
+- Webhook signals trigger trades within <200ms.
+- Audit logs are retrievable and accurate.

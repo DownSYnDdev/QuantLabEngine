@@ -1,0 +1,22 @@
+{
+    "id": "tenantA",
+    "name": "Alpha Capital",
+    "domain": "trader.alphacapital.com",
+    "branding": {
+        "logoUrl": "https://cdn.alphacapital.com/assets/logo-full.png",
+        "primaryColor": "#0F52BA",
+        "secondaryColor": "#FFFFFF"
+    },
+    "allowedConfigs": [
+        "25k-eval-v1",
+        "50k-eval-v1",
+        "100k-eval-v1"
+    ],
+    "webhookSecret": "whsec_alpha_0a1b2c3d4e5f6g7h8i9j0k",
+    "apiKeys": {
+        "paymentProvider": "pk_test_alpha_stripe_key",
+        "emailService": "SG.alpha_key"
+    },
+    "dataProvider": "polygon",
+    "brokerId": "bridge_alpha_01"
+}

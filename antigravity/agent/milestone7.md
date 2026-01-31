@@ -89,7 +89,14 @@ Deploy QuantLab to a secure, scalable cloud environment using containerization, 
 
 ---
 
-### 7. Database Deployment & Scaling
+### 7. Custom Rule Engine Support
+- Enable tenants to define custom rules via DSL:
+  - `check_custom_rule(equity, drawdown)`
+- Deploy sandboxed rule executors (AWS Lambda / Isolated Pods).
+
+---
+
+### 8. Database Deployment & Scaling
 - Deploy PostgreSQL (managed or self‑hosted)
 - Deploy Redis for:
   - Caching
@@ -117,6 +124,7 @@ Deploy QuantLab to a secure, scalable cloud environment using containerization, 
 ## Deliverables
 - Fully containerized application
 - Kubernetes deployment with autoscaling
+- Custom rule executor service
 - API gateway with SSL and routing
 - CI/CD pipeline with automated staging deploys
 - Logging, metrics, and alerting dashboards

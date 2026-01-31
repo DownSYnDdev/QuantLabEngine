@@ -1,0 +1,18 @@
+{
+    "name": "execute-simulated-trade",
+    "description": "Executes a validated order in the simulation engine, updating account state.",
+    "parameters": {
+        "accountId": "string",
+        "order": {
+            "symbol": "string",
+            "side": "string",
+            "size": "number",
+            "price": "number"
+        }
+    },
+    "returns": {
+        "executionId": "string",
+        "filledPrice": "number",
+        "status": "string"
+    }
+}

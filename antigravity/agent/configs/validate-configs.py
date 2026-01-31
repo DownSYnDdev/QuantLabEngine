@@ -13,16 +13,18 @@ schema_match = schema_content.split('```json\n')[1].split('\n```')[0]
 schema = json.loads(schema_match)
 
 # Config files to validate
-config_files = [
-    script_dir / "25k-eval-v1.json",
-    script_dir / "25k-straight-v1.json",
-    script_dir / "50k-eval-v1.json",
-    script_dir / "50k-straight-v1.json",
-    script_dir / "100k-eval-v1.json",
-    script_dir / "100k-straight-v1.json",
-    script_dir / "150k-eval-v1.json",
-    script_dir / "150k-straight-v1.json",
+# Scan for all config files, excluding non-config JSONs
+# Scan for all config files, excluding non-config JSONs
+all_json_files = list(script_dir.glob("*.json"))
+excluded_files = [
+    "validation-results.json", 
+    "simulation-results.json", 
+    "integration-test-results.json",
+    "package.json",
+    "tsconfig.json"
 ]
+
+config_files = [f for f in all_json_files if f.name not in excluded_files]
 
 validation_results = []
 all_valid = True

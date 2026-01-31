@@ -1,0 +1,32 @@
+{
+    "id": "versioned-25k",
+    "displayName": "Versioned 25k Account",
+    "baseCapital": 25000,
+    "variant": "evaluation",
+    "tenantId": "tenantB",
+    "ruleEngineVersion": "1.1.0",
+    "allowedInstruments": [
+        "EURUSD",
+        "BTCUSD"
+    ],
+    "challengeDefinitions": [
+        {
+            "id": "stage1",
+            "name": "Stage 1",
+            "rules": {
+                "profitTarget": 2000,
+                "maxDrawdown": 1200,
+                "dailyLossLimit": 800
+            }
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [],
+        "partialPayoutAllowed": true
+    },
+    "meta": {
+        "version": "1.0.1",
+        "createdBy": "admin",
+        "changeNotes": "Increased max drawdown, added daily loss limit"
+    }
+}

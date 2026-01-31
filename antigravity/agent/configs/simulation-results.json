@@ -1,12 +1,132 @@
 {
-  "timestamp": "2026-01-28T09:14:17.703410",
+  "timestamp": "2026-01-31T10:47:37.800725",
   "simulation_type": "dry-run",
   "endpoint": "POST /internal/simulate-config",
-  "total_configs": 8,
-  "passed": 8,
+  "total_configs": 13,
+  "passed": 13,
   "failed": 0,
   "errors": 0,
   "results": [
+    {
+      "config_id": "100k-eval-v1",
+      "config_name": "100k-eval-v1.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $100,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "2 challenge(s) defined"
+        },
+        {
+          "check": "PayoutPercentageSum",
+          "status": "PASS",
+          "message": "Payout percentages sum to 100%"
+        },
+        {
+          "check": "EvaluationStructure",
+          "status": "PASS",
+          "message": "Evaluation has 2 stages"
+        }
+      ],
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "config_id": "100k-straight-v1",
+      "config_name": "100k-straight-v1.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $100,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "1 challenge(s) defined"
+        },
+        {
+          "check": "PayoutPercentageSum",
+          "status": "WARNING",
+          "message": "Payout percentages sum to 60% (expected 100%)"
+        },
+        {
+          "check": "StraightToFundedStructure",
+          "status": "PASS",
+          "message": "Straight-to-funded structure is correct"
+        }
+      ],
+      "warnings": [
+        "Unusual payout total: 60%"
+      ],
+      "errors": []
+    },
+    {
+      "config_id": "150k-eval-v1",
+      "config_name": "150k-eval-v1.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $150,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "2 challenge(s) defined"
+        },
+        {
+          "check": "PayoutPercentageSum",
+          "status": "PASS",
+          "message": "Payout percentages sum to 100%"
+        },
+        {
+          "check": "EvaluationStructure",
+          "status": "PASS",
+          "message": "Evaluation has 2 stages"
+        }
+      ],
+      "warnings": [],
+      "errors": []
+    },
+    {
+      "config_id": "150k-straight-v1",
+      "config_name": "150k-straight-v1.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $150,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "1 challenge(s) defined"
+        },
+        {
+          "check": "PayoutPercentageSum",
+          "status": "WARNING",
+          "message": "Payout percentages sum to 60% (expected 100%)"
+        },
+        {
+          "check": "StraightToFundedStructure",
+          "status": "PASS",
+          "message": "Straight-to-funded structure is correct"
+        }
+      ],
+      "warnings": [
+        "Unusual payout total: 60%"
+      ],
+      "errors": []
+    },
     {
       "config_id": "25k-eval-v1",
       "config_name": "25k-eval-v1.json",
@@ -128,122 +248,107 @@
       "errors": []
     },
     {
-      "config_id": "100k-eval-v1",
-      "config_name": "100k-eval-v1.json",
+      "config_id": "base-50k",
+      "config_name": "base-config.json",
       "status": "PASS",
       "checks": [
         {
           "check": "BaseCapitalValidation",
           "status": "PASS",
-          "message": "Base capital $100,000 is valid"
-        },
-        {
-          "check": "ChallengeDefinitionsPresent",
-          "status": "PASS",
-          "message": "2 challenge(s) defined"
-        },
-        {
-          "check": "PayoutPercentageSum",
-          "status": "PASS",
-          "message": "Payout percentages sum to 100%"
-        },
-        {
-          "check": "EvaluationStructure",
-          "status": "PASS",
-          "message": "Evaluation has 2 stages"
-        }
-      ],
-      "warnings": [],
-      "errors": []
-    },
-    {
-      "config_id": "100k-straight-v1",
-      "config_name": "100k-straight-v1.json",
-      "status": "PASS",
-      "checks": [
-        {
-          "check": "BaseCapitalValidation",
-          "status": "PASS",
-          "message": "Base capital $100,000 is valid"
+          "message": "Base capital $50,000 is valid"
         },
         {
           "check": "ChallengeDefinitionsPresent",
           "status": "PASS",
           "message": "1 challenge(s) defined"
-        },
-        {
-          "check": "PayoutPercentageSum",
-          "status": "WARNING",
-          "message": "Payout percentages sum to 60% (expected 100%)"
-        },
-        {
-          "check": "StraightToFundedStructure",
-          "status": "PASS",
-          "message": "Straight-to-funded structure is correct"
         }
       ],
       "warnings": [
-        "Unusual payout total: 60%"
+        "Evaluation typically has 2+ stages"
       ],
       "errors": []
     },
     {
-      "config_id": "150k-eval-v1",
-      "config_name": "150k-eval-v1.json",
+      "config_id": "inherited-50k-tenantC",
+      "config_name": "inherited-config.json",
       "status": "PASS",
       "checks": [
         {
           "check": "BaseCapitalValidation",
           "status": "PASS",
-          "message": "Base capital $150,000 is valid"
-        },
-        {
-          "check": "ChallengeDefinitionsPresent",
-          "status": "PASS",
-          "message": "2 challenge(s) defined"
-        },
-        {
-          "check": "PayoutPercentageSum",
-          "status": "PASS",
-          "message": "Payout percentages sum to 100%"
-        },
-        {
-          "check": "EvaluationStructure",
-          "status": "PASS",
-          "message": "Evaluation has 2 stages"
-        }
-      ],
-      "warnings": [],
-      "errors": []
-    },
-    {
-      "config_id": "150k-straight-v1",
-      "config_name": "150k-straight-v1.json",
-      "status": "PASS",
-      "checks": [
-        {
-          "check": "BaseCapitalValidation",
-          "status": "PASS",
-          "message": "Base capital $150,000 is valid"
+          "message": "Base capital $50,000 is valid"
         },
         {
           "check": "ChallengeDefinitionsPresent",
           "status": "PASS",
           "message": "1 challenge(s) defined"
-        },
-        {
-          "check": "PayoutPercentageSum",
-          "status": "WARNING",
-          "message": "Payout percentages sum to 60% (expected 100%)"
-        },
-        {
-          "check": "StraightToFundedStructure",
-          "status": "PASS",
-          "message": "Straight-to-funded structure is correct"
         }
       ],
       "warnings": [
-        "Unusual payout total: 60%"
+        "Evaluation typically has 2+ stages"
+      ],
+      "errors": []
+    },
+    {
+      "config_id": "tenant-demo-25k",
+      "config_name": "tenant-aware-config.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $25,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "1 challenge(s) defined"
+        }
+      ],
+      "warnings": [
+        "Evaluation typically has 2+ stages"
+      ],
+      "errors": []
+    },
+    {
+      "config_id": "versioned-25k",
+      "config_name": "versioned-config-v1.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $25,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "1 challenge(s) defined"
+        }
+      ],
+      "warnings": [
+        "Evaluation typically has 2+ stages"
+      ],
+      "errors": []
+    },
+    {
+      "config_id": "versioned-25k",
+      "config_name": "versioned-config-v2.json",
+      "status": "PASS",
+      "checks": [
+        {
+          "check": "BaseCapitalValidation",
+          "status": "PASS",
+          "message": "Base capital $25,000 is valid"
+        },
+        {
+          "check": "ChallengeDefinitionsPresent",
+          "status": "PASS",
+          "message": "1 challenge(s) defined"
+        }
+      ],
+      "warnings": [
+        "Evaluation typically has 2+ stages"
       ],
       "errors": []
     }

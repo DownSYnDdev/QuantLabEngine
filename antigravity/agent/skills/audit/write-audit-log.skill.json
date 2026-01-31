@@ -1,0 +1,13 @@
+{
+    "name": "write-audit-log",
+    "description": "Persists an event to the audit log storage.",
+    "parameters": {
+        "tenantId": "string",
+        "accountId": "string",
+        "event": "object"
+    },
+    "returns": {
+        "success": "boolean",
+        "path": "string"
+    }
+}

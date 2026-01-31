@@ -1,0 +1,12 @@
+{
+    "name": "check-min-days",
+    "description": "Checks if the trader has traded the minimum required number of days.",
+    "parameters": {
+        "actualTradingDays": "integer",
+        "minTradingDays": "integer"
+    },
+    "returns": {
+        "violation": "boolean",
+        "detail": "string"
+    }
+}

@@ -1,293 +1,215 @@
 # Technical Architecture Document (TAD)
-## Project: QuantLab — TradingView‑Like Platform with Algo‑Ready DSL
+## Project: QuantLabEngine — White-Label Prop-Firm Simulated Trading Platform
 
 ## 1. System Overview
-QuantLab is a modular, scalable, cloud‑deployable platform for real‑time charting, technical analysis, and algorithmic trading. The system consists of a modern frontend, a microservice‑friendly backend, a custom DSL engine, a backtesting engine, and real‑time data infrastructure. All components must be designed for low latency, high throughput, and safe execution of user‑generated code.
+QuantLabEngine is a modular, scalable, cloud-deployable platform for real-time charting, simulated trading, and algorithmic signal execution. Designed as a white-label backend for proprietary trading firms, it provides multi-tenant isolation, rule enforcement, webhook-based algo-bot integration, and immutable audit logging.
 
 ---
 
-## 2. High‑Level Architecture
+## 2. High-Level Architecture
 
 ### 2.1 Core Components
 - **Frontend Application**
-  - React or Next.js
+  - Next.js
   - WebGL/Canvas charting engine
   - DSL editor with syntax highlighting
-  - WebSocket client for real‑time data
+  - WebSocket client for real-time data
+  - Tenant-aware branding
 
 - **Backend Services**
-  - REST API service
-  - WebSocket streaming service
-  - DSL interpreter service
-  - Backtesting engine
-  - Order simulation engine
-  - User account service
-  - Persistence service
+  - REST API Gateway
+  - WebSocket Streaming Service
+  - DSL Interpreter Service
+  - Backtesting Engine
+  - Order Simulation Engine
+  - **Rule Enforcement Engine** (NEW)
+  - **Webhook Ingestion Service** (NEW)
+  - **Audit Logging Service** (NEW)
+  - User Account Service
+  - Persistence Service
 
 - **Data Layer**
-  - PostgreSQL (relational data)
-  - Redis (caching + real‑time state)
-  - Optional: TimescaleDB (time‑series optimization)
+  - PostgreSQL (relational data, tenant-isolated)
+  - Redis (caching, session state, rate limiting)
+  - Optional: TimescaleDB (time-series optimization)
 
 - **Infrastructure**
   - Dockerized services
   - Kubernetes orchestration
   - Load balancer + API gateway
-  - Logging + monitoring stack
+  - Logging + monitoring stack (Prometheus, Grafana, Loki)
 
 ---
 
-## 3. Frontend Architecture
+## 3. Multi-Tenant Architecture
 
-### 3.1 Framework
-- React or Next.js
-- Component‑based architecture
-- State management via Zustand, Redux, or equivalent
+### 3.1 Tenant Isolation
+- All data namespaced by `tenantId`.
+- PostgreSQL Row-Level Security (RLS) or application-level enforcement.
+- Separate encryption keys per tenant (optional).
 
-### 3.2 Charting Engine
-- WebGL preferred for performance
-- Canvas fallback for compatibility
-- Rendering pipeline:
-  - Data normalization
-  - GPU‑accelerated drawing
-  - Layered rendering (candles, indicators, overlays)
-  - Event handlers (zoom, pan, crosshair)
+### 3.2 Tenant Configuration
+- Loaded from `agent/configs/tenants/{tenantId}.json`.
+- Includes: branding, allowed account types, webhook secrets, data provider keys.
 
-### 3.3 DSL Editor
-- Syntax highlighting
-- Auto‑completion
-- Error markers
-- Integration with backend for:
-  - Parsing
-  - Execution
-  - Backtesting
-
-### 3.4 Real‑Time Data Client
-- WebSocket connection manager
-- Auto‑reconnect
-- Heartbeat/ping system
-- Subscription manager for multiple symbols
+### 3.3 API Authentication
+- Each tenant receives a unique API key.
+- All requests validated against `tenantId` claim.
 
 ---
 
-## 4. Backend Architecture
+## 4. Webhook Bot Pipeline
 
-### 4.1 API Gateway
+### 4.1 Signal Flow
+```
+External Bot → POST /webhooks/signals → Validate HMAC → Rate Limit Check → Map to Account → Simulate Trade → Emit Events
+```
+
+### 4.2 Components
+- **Ingestion Endpoint**: Receives JSON signals.
+- **HMAC Validator**: Verifies `X-Signature` header.
+- **Rate Limiter**: Token bucket per account (default: 10 req/min).
+- **Order Router**: Forwards valid signals to Order Simulation Engine.
+
+### 4.3 Events Emitted
+- `webhook.received`
+- `webhook.validated`
+- `webhook.rejected`
+- `webhook.trade_executed`
+
+---
+
+## 5. Rule Enforcement Engine
+
+### 5.1 Rule Types
+- **Daily Loss Limit**: Checks equity change within trading day.
+- **Max Drawdown**: Checks trailing high-water mark.
+- **Consistency Rule**: Checks for single-day dominance.
+- **Trading Hours**: Validates signal timestamps.
+- **Instrument Allowlist**: Validates symbols against tenant config.
+
+### 5.2 Enforcement Points
+- On every simulated fill.
+- On periodic checkpoint (e.g., every 5 minutes).
+- On daily reset.
+
+### 5.3 Violation Handling
+- Emit `rule.violation.*` event immediately.
+- Write to immutable audit log.
+- Optionally disable account or reject pending orders.
+
+---
+
+## 6. Audit Logging System
+
+### 6.1 Log Structure
+- `tenantId`, `accountId`, `eventType`, `timestamp`, `payload`, `hash`.
+- Append-only storage (write-once).
+
+### 6.2 Query API
+- `GET /tenants/{tenantId}/accounts/{accountId}/audit-logs`
+- Filter by: `startTime`, `endTime`, `eventType`.
+
+### 6.3 Retention
+- Configurable per account type (default: 90 days).
+
+---
+
+## 7. Frontend Architecture
+- React/Next.js
+- Component-based architecture
+- State management via Zustand or Redux
+- WebGL charting with Canvas fallback
+- DSL editor with Monaco
+
+---
+
+## 8. Backend Services Detail
+
+### 8.1 API Gateway
 - Routes REST and WebSocket traffic
-- Handles authentication
-- Rate limiting
-- Request validation
+- Handles authentication (JWT/API Key)
+- Rate limiting, request validation
 
-### 4.2 REST API Service
-- User management
-- Watchlists
-- Saved layouts
-- Saved indicators/strategies
-- Backtest requests
-- DSL validation
+### 8.2 Order Simulation Engine
+- Market, Limit, Stop, OCO, Bracket orders
+- Slippage modeling, partial fills
+- Position tracking, portfolio state
 
-### 4.3 WebSocket Streaming Service
-- Real‑time tick and bar data
-- Multi‑symbol subscriptions
-- Efficient batching
-- Backpressure handling
+### 8.3 DSL Interpreter
+- Sandboxed execution (CPU/memory limits)
+- Event-driven model (on_bar, on_tick, on_fill)
 
-### 4.4 DSL Interpreter Service
-- Parses DSL code
-- Generates AST
-- Executes code in sandbox
-- Supports:
-  - indicator mode
-  - strategy mode
-  - event‑driven mode
-- Enforces CPU, memory, and time limits
-
-### 4.5 Backtesting Engine
-- Tick‑level simulation
-- Bar‑level fallback
-- Multi‑symbol support
+### 8.4 Backtesting Engine
+- Tick-level simulation
 - Deterministic execution
-- Slippage + partial fills
-- Portfolio‑level accounting
-
-### 4.6 Order Simulation Engine
-- Market, limit, stop, OCO, bracket orders
-- Fill logic
-- Slippage modeling
-- Position tracking
-- Event callbacks to DSL
+- Multi-symbol support
 
 ---
 
-## 5. DSL Architecture
+## 9. Data Architecture
 
-### 5.1 Language Design
-- Pine‑inspired but not Pine‑compatible
-- Clean, readable syntax
-- Supports:
-  - variables
-  - arrays
-  - dictionaries
-  - custom functions
-  - multi‑symbol references
+### 9.1 PostgreSQL
+- Users, Accounts, Trades, Audit Logs, Configs
+- Tenant-scoped via `tenant_id` column
 
-### 5.2 Parser
-- Grammar defined in EBNF
-- Lexer + parser generated automatically
-- Produces AST nodes:
-  - expressions
-  - statements
-  - event handlers
-  - order instructions
-
-### 5.3 AST
-- Strongly typed node definitions
-- Optimized for fast interpretation
-- Supports:
-  - arithmetic
-  - logical operations
-  - function calls
-  - event blocks
-
-### 5.4 Interpreter
-- Executes AST in a sandbox
-- Supports:
-  - bar‑based execution
-  - tick‑based execution
-  - event‑driven execution
-- Maintains:
-  - variable scope
-  - symbol state
-  - portfolio state
-
-### 5.5 Sandbox
-- No filesystem access
-- No network access
-- CPU time limits
-- Memory limits
-- Infinite loop detection
-- Execution timeout
-
-### 5.6 Event System
-Supported events:
-- on_start()
-- on_end()
-- on_tick(symbol)
-- on_bar(symbol)
-- on_order_fill(order)
-- on_position_change(position)
-
-### 5.7 Order Engine Integration
-- DSL can submit orders
-- Engine simulates fills
-- Events fed back into DSL
-
----
-
-## 6. Data Architecture
-
-### 6.1 PostgreSQL
-Stores:
-- users
-- watchlists
-- saved layouts
-- saved indicators/strategies
-- backtest results
-- audit logs
-
-### 6.2 Redis
-Stores:
-- real‑time symbol state
-- tick buffers
+### 9.2 Redis
+- Real-time symbol state
 - WebSocket subscription state
-- rate limiting counters
-
-### 6.3 TimescaleDB (optional)
-Stores:
-- historical OHLCV data
-- tick data
-- backtest datasets
+- Rate limiting counters
 
 ---
 
-## 7. Infrastructure Architecture
+## 10. Infrastructure
 
-### 7.1 Containerization
-- All services run in Docker containers
-- Shared base images for consistency
+### 10.1 Containerization
+- All services in Docker
+- Multi-stage builds, minimal base images
 
-### 7.2 Kubernetes
-- Deployment objects for each service
+### 10.2 Kubernetes
+- Deployments, Services, ConfigMaps, Secrets
 - Horizontal Pod Autoscaling
-- ConfigMaps + Secrets
-- Ingress controller
 
-### 7.3 CI/CD
-- Automated builds
-- Automated tests
-- Automated deployments to staging
-- Manual approval for production
+### 10.3 CI/CD
+- GitHub Actions or GitLab CI
+- Automated tests, linting, deploys
 
-### 7.4 Logging & Monitoring
-- Centralized logs (ELK or Loki)
-- Metrics (Prometheus)
-- Dashboards (Grafana)
-- Alerts for:
-  - latency spikes
-  - failed deployments
-  - DSL sandbox violations
+### 10.4 Observability
+- Prometheus metrics
+- Grafana dashboards
+- Loki or ELK for logs
 
 ---
 
-## 8. Security Architecture
+## 11. Security
 
-### 8.1 Authentication
-- JWT or OAuth2
-- Refresh tokens
-- Secure password hashing
+### 11.1 Authentication
+- JWT or OAuth2, refresh tokens
+- Secure password hashing (Argon2)
 
-### 8.2 Authorization
-- Role‑based access control
-- API rate limits
-- Per‑user resource quotas
+### 11.2 Authorization
+- Role-based access control
+- Tenant-scoped API keys
 
-### 8.3 DSL Sandboxing
-- CPU, memory, and time limits
+### 11.3 DSL Sandboxing
+- CPU, memory, time limits
 - No external access
-- Safe standard library
-- Execution isolation
 
-### 8.4 Data Security
-- Encrypted connections
-- Encrypted secrets
-- Audit logging
+### 11.4 Webhook Security
+- HMAC signature validation
+- Replay protection via timestamp
 
 ---
 
-## 9. Performance Requirements
+## 12. Performance Requirements
 - Chart rendering: 60 FPS
-- Real‑time update latency: <100ms
+- Real-time latency: <100ms
 - DSL execution: <5ms per tick
-- Backtesting:
-  - 1M ticks processed in <2 seconds
-- WebSocket throughput:
-  - 10K messages/sec per node
+- Backtesting: 1M ticks < 2 seconds
 
 ---
 
-## 10. Deployment Environments
-- **Local development**
-- **Staging cluster**
-- **Production cluster**
-- **Optional: multi‑region deployment**
-
----
-
-## 11. Acceptance Criteria
-- All components deploy successfully to Kubernetes.
-- DSL supports indicators, strategies, and event‑driven logic.
-- Backtesting engine is tick‑accurate and deterministic.
-- Multi‑symbol strategies run without performance degradation.
-- Real‑time updates remain under 100ms latency.
-- Charts render at 60 FPS.
-- System passes security audits.
+## 13. Deployment Environments
+- Local development
+- Staging cluster
+- Production cluster

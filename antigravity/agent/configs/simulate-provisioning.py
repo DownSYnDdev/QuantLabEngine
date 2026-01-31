@@ -7,17 +7,18 @@ import sys
 sys.stdout.reconfigure(encoding='utf-8')
 
 # Config files to simulate
+# Config files to simulate
 script_dir = Path(__file__).parent
-config_files = [
-    script_dir / "25k-eval-v1.json",
-    script_dir / "25k-straight-v1.json",
-    script_dir / "50k-eval-v1.json",
-    script_dir / "50k-straight-v1.json",
-    script_dir / "100k-eval-v1.json",
-    script_dir / "100k-straight-v1.json",
-    script_dir / "150k-eval-v1.json",
-    script_dir / "150k-straight-v1.json",
+all_json_files = list(script_dir.glob("*.json"))
+excluded_files = [
+    "validation-results.json", 
+    "simulation-results.json", 
+    "integration-test-results.json",
+    "package.json",
+    "tsconfig.json"
 ]
+
+config_files = [f for f in all_json_files if f.name not in excluded_files]
 
 def simulate_config_provisioning(config_data, config_name):
     """

@@ -1,0 +1,15 @@
+{
+    "name": "validate-signal",
+    "description": "Validates the authenticity and business logic of a webhook signal.",
+    "parameters": {
+        "signature": "string",
+        "timestamp": "string",
+        "payload": "object",
+        "secret": "string",
+        "accountConfig": "object"
+    },
+    "returns": {
+        "isValid": "boolean",
+        "validationErrors": "array<string>"
+    }
+}

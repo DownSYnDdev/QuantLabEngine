@@ -1,0 +1,14 @@
+{
+    "name": "receive-webhook-signal",
+    "description": "Ingests a raw webhook request, logs it, and performs initial structure validation.",
+    "parameters": {
+        "headers": "object",
+        "body": "object",
+        "ip": "string"
+    },
+    "returns": {
+        "success": "boolean",
+        "requestId": "string",
+        "error": "string"
+    }
+}

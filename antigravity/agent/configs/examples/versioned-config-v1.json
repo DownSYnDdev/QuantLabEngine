@@ -1,0 +1,26 @@
+{
+    "id": "versioned-25k",
+    "displayName": "Versioned 25k Account",
+    "baseCapital": 25000,
+    "variant": "evaluation",
+    "tenantId": "tenantB",
+    "ruleEngineVersion": "1.0.0",
+    "challengeDefinitions": [
+        {
+            "id": "stage1",
+            "name": "Stage 1",
+            "rules": {
+                "profitTarget": 2000,
+                "maxDrawdown": 1000
+            }
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [],
+        "partialPayoutAllowed": false
+    },
+    "meta": {
+        "version": "1.0.0",
+        "createdBy": "admin"
+    }
+}

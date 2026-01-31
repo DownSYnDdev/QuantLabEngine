@@ -1,55 +1,50 @@
-# Tenant Configuration
+# Tenant Configuration Schema
+Version: 1.0.0
+Scope: Defines the structure for configuring distinct prop-firm tenants on the platform.
 
-## Summary
+Each tenant has a unique JSON configuration that dictates their branding, allowed products, security keys, and data providers.
 
-Tenant Configuration describes how propfirms configure and customize their QuantLab instance for white-label licensing. Each tenant has isolated account configs, webhook secrets, branding settings, and operational parameters. Tenant configs support versioning, allow per-tenant rule customization, and enable multiple propfirms to operate independently on the same QuantLab platform while maintaining complete data isolation and security.
+## Schema Definition
 
-## TODO
+### 1. Identity & Branding
+Controls the visual appearance of the white-label dashboard.
+- `id` (string): Unique identifier (e.g., "tenantA").
+- `name` (string): Display name.
+- `domain` (string): Custom domain (e.g., "start.alphacapital.com").
+- `branding` (object):
+  - `logoUrl` (string): Path to logo.
+  - `primaryColor` (string): Hex code (e.g., "#0055FF").
+  - `secondaryColor` (string): Hex code.
 
-- [ ] Define tenant configuration schema
-  - [ ] Tenant metadata: `tenantId`, `tenantName`, `contactEmail`, `status` (active/suspended)
-  - [ ] Branding: logo URLs, color schemes, custom domains
-  - [ ] Operational settings: timezone, default currency, data retention policies
-- [ ] Document account type configuration management
-  - [ ] How tenants define custom account configs (25k, 50k, 100k, 150k, etc.)
-  - [ ] Config versioning and migration strategies
-  - [ ] Override default rules per tenant
-- [ ] Document webhook configuration
-  - [ ] Webhook callback URLs for event delivery
-  - [ ] Webhook secrets and signature keys
-  - [ ] Event type subscriptions (which events to receive)
-  - [ ] Retry policies and failure handling
-- [ ] Document API access and quotas
-  - [ ] API key generation and rotation
-  - [ ] Rate limits per tenant
-  - [ ] Usage quotas and billing integration hooks
-- [ ] Document multi-tenant isolation guarantees
-  - [ ] Data namespacing by `tenantId`
-  - [ ] User and account separation
-  - [ ] Config and secret isolation
-  - [ ] Cross-tenant access prevention
-- [ ] Document tenant admin endpoints
-  - [ ] `POST /api/v1/admin/tenants` - create new tenant
-  - [ ] `GET /api/v1/admin/tenants/{tenantId}` - retrieve tenant config
-  - [ ] `PUT /api/v1/admin/tenants/{tenantId}` - update tenant settings
-  - [ ] `DELETE /api/v1/admin/tenants/{tenantId}` - deactivate tenant
-- [ ] Provide sample tenant configuration files
-  - [ ] `agent/configs/tenants/example-tenant-config.json`
-  - [ ] Include all configurable settings with defaults
-- [ ] Document tenant onboarding workflow
-  - [ ] Initial setup steps
-  - [ ] API key provisioning
-  - [ ] Webhook testing and validation
-  - [ ] First account creation
-- [ ] Document security best practices
-  - [ ] Secret rotation schedules
-  - [ ] IP whitelisting options
-  - [ ] Audit log access and retention
-- [ ] Document config versioning and backwards compatibility
+### 2. Allowed Account Types
+Restricts which account configurations are available to this tenant's users.
+- `allowedConfigs` (array<string>): List of `configId`s (from `account-schema.md` definitions).
 
-## Related Documents
+### 3. Security & Integrations
+Manages secrets for webhooks and external APIs.
+- `webhookSecret` (string): Shared secret for HMAC signature verification of incoming signals.
+- `apiKeys` (object): Keys for external services.
+  - `paymentProvider` (string): e.g., Stripe public key.
+  - `emailService` (string): e.g., SendGrid key.
 
-- [provisioning-api.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/provisioning-api.md) - Tenant provisioning endpoints
-- [webhook-bots.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/webhook-bots.md) - Webhook configuration
-- [propfirm-model.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/propfirm-model.md) - Multi-tenant architecture
-- [account-schema.md](file:///c:/Users/Mason/Documents/Antigrav%20projects/Quantlab/antigravity/agent/docs/account-schema.md) - Account config customization
+### 4. Data Provider Configuration
+Specifies the source of market data and trade execution for this tenant.
+- `dataProvider` (string): "polygon", "binance", etc.
+- `brokerId` (string): Internal mapping to a liquidity bridge.
+
+## Example
+
+```json
+{
+  "id": "tenantA",
+  "name": "Alpha Capital",
+  "domain": "trader.alphacapital.com",
+  "branding": {
+    "logoUrl": "https://assets.alphacapital.com/logo.png",
+    "primaryColor": "#1A73E8"
+  },
+  "allowedConfigs": ["25k-eval-v1", "50k-straight-v1"],
+  "webhookSecret": "sec_8843d1a8...",
+  "dataProvider": "polygon"
+}
+```

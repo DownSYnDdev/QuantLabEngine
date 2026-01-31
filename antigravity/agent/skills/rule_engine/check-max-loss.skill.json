@@ -1,0 +1,13 @@
+{
+    "name": "check-max-loss",
+    "description": "Checks if the account equity has breached the maximum total loss limit.",
+    "parameters": {
+        "currentEquity": "number",
+        "initialBalance": "number",
+        "maxLossLimit": "number"
+    },
+    "returns": {
+        "violation": "boolean",
+        "detail": "string"
+    }
+}
