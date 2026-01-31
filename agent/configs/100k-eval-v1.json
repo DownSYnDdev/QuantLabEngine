@@ -1,0 +1,60 @@
+{
+    "id": "100k-eval-v1",
+    "displayName": "100k Evaluation",
+    "description": "100k evaluation path with two-stage challenge",
+    "baseCapital": 100000,
+    "currency": "USD",
+    "variant": "evaluation",
+    "challengeDefinitions": [
+        {
+            "id": "stage-1",
+            "name": "Stage 1",
+            "rules": {
+                "profitTarget": 0.04,
+                "maxDrawdown": 0.06,
+                "dailyLossLimit": 0.02,
+                "minTradingDays": 3,
+                "orderTypesAllowed": [
+                    "market",
+                    "limit",
+                    "stop"
+                ]
+            },
+            "durationDays": 14
+        },
+        {
+            "id": "stage-2",
+            "name": "Stage 2",
+            "rules": {
+                "profitTarget": 0.03,
+                "maxDrawdown": 0.05,
+                "dailyLossLimit": 0.015,
+                "minTradingDays": 5,
+                "consistencyRule": {
+                    "minWinningDays": 3
+                }
+            },
+            "durationDays": 30
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [
+            {
+                "milestone": "stage-1-pass",
+                "payoutPercent": 30
+            },
+            {
+                "milestone": "stage-2-pass",
+                "payoutPercent": 70
+            }
+        ],
+        "escrowPolicy": {
+            "holdPeriodDays": 7
+        },
+        "partialPayoutAllowed": true
+    },
+    "meta": {
+        "createdBy": "system",
+        "version": "v1"
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "id": "100k-straight-v1",
+    "displayName": "100k Straight to Funded",
+    "description": "100k straight to funded with enterprise controls",
+    "baseCapital": 100000,
+    "currency": "USD",
+    "variant": "straight-to-funded",
+    "challengeDefinitions": [
+        {
+            "id": "funded",
+            "name": "Funded Account Rules",
+            "rules": {
+                "profitTarget": 0.0,
+                "maxDrawdown": 0.10,
+                "dailyLossLimit": 0.015,
+                "minTradingDays": 0,
+                "consistencyRule": {
+                    "minWinningDays": 4,
+                    "minTradesPerDay": 1
+                },
+                "orderTypesAllowed": [
+                    "market",
+                    "limit",
+                    "stop",
+                    "bracket"
+                ],
+                "leverage": 2
+            },
+            "durationDays": 0
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [
+            {
+                "milestone": "monthly-profit",
+                "payoutPercent": 60
+            }
+        ],
+        "escrowPolicy": {
+            "holdPeriodDays": 14
+        },
+        "partialPayoutAllowed": true
+    },
+    "meta": {
+        "createdBy": "system",
+        "version": "v1"
+    }
+}

@@ -1,0 +1,48 @@
+{
+    "id": "150k-straight-v1",
+    "displayName": "150k Straight to Funded",
+    "description": "150k straight to funded with enterprise controls",
+    "baseCapital": 150000,
+    "currency": "USD",
+    "variant": "straight-to-funded",
+    "challengeDefinitions": [
+        {
+            "id": "funded",
+            "name": "Funded Account Rules",
+            "rules": {
+                "profitTarget": 0.0,
+                "maxDrawdown": 0.10,
+                "dailyLossLimit": 0.01,
+                "minTradingDays": 0,
+                "consistencyRule": {
+                    "minWinningDays": 5,
+                    "minTradesPerDay": 1
+                },
+                "orderTypesAllowed": [
+                    "market",
+                    "limit",
+                    "stop",
+                    "bracket"
+                ],
+                "leverage": 2
+            },
+            "durationDays": 0
+        }
+    ],
+    "payoutRules": {
+        "stagedPayouts": [
+            {
+                "milestone": "monthly-profit",
+                "payoutPercent": 60
+            }
+        ],
+        "escrowPolicy": {
+            "holdPeriodDays": 14
+        },
+        "partialPayoutAllowed": true
+    },
+    "meta": {
+        "createdBy": "system",
+        "version": "v1"
+    }
+}
