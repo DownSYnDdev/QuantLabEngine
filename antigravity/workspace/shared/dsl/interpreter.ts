@@ -54,7 +54,7 @@ export interface OHLCVBar {
  */
 export interface OverlayData {
     name: string;
-    type: 'line' | 'multi-line' | 'band';
+    type: 'line' | 'histogram' | 'area';
     color: string;
     data: { timestamp: string; value: number }[];
 }
@@ -245,7 +245,149 @@ const BUILTIN_INDICATORS: Record<string, (bars: OHLCVBar[], ...args: any[]) => n
         }
 
         return result;
+        return result;
     },
+
+    /**
+     * MACD
+     * Returns: { macd, signal, histogram }
+     */
+    macd: (bars: OHLCVBar[], ...args: any[]): any => {
+        const { series: prices, rest } = resolveSeriesAndParams(bars, args);
+        const fastPeriod = (rest[0] as number) || 12;
+        const slowPeriod = (rest[1] as number) || 26;
+        const signalPeriod = (rest[2] as number) || 9;
+
+        // Helper for EMA
+        const calcEMA = (data: number[], p: number): number[] => {
+            const k = 2 / (p + 1);
+            const r: number[] = [];
+            let sum = 0;
+            for (let i = 0; i < p && i < data.length; i++) {
+                sum += data[i];
+                r.push(NaN);
+            }
+            if (r.length > 0) r[r.length - 1] = sum / p; // Initialize with SMA
+
+            for (let i = p; i < data.length; i++) {
+                const prev = r[r.length - 1];
+                const val = isNaN(prev) ? data[i] : (data[i] - prev) * k + prev;
+                r.push(val);
+            }
+            // Backfill NaNs to match data length if needed, specifically for strict alignment
+            while (r.length < data.length) r.unshift(NaN); // Should match
+            return r;
+        };
+
+        // Re-implementing EMA correctly inside here to ensure consistency and access
+        // Alternatively, call BUILTIN_INDICATORS.ema if accessible?
+        // BUILTIN_INDICATORS is being defined, can't reference itself easily inside initializer without proper typing or separation.
+        // Copying simple EMA logic for safety.
+
+        // EMA Fast
+        const emastart = prices; // array
+        // Calculate EMAs
+        // Note: The simple inline EMA loop above in `ema` property had issues with `i < period` vs `i < prices.length` check logic.
+        // Let's rely on a robust calc.
+
+        // Correct EMA logic (Standard)
+        const getEMA = (src: number[], len: number) => {
+            const res: number[] = new Array(src.length).fill(NaN);
+            if (src.length < len) return res;
+
+            let sum = 0;
+            for (let i = 0; i < len; i++) sum += src[i];
+            res[len - 1] = sum / len; // SMA seed
+
+            const mult = 2 / (len + 1);
+            for (let i = len; i < src.length; i++) {
+                res[i] = (src[i] - res[i - 1]) * mult + res[i - 1];
+            }
+            return res;
+        };
+
+        const fastMA = getEMA(prices, fastPeriod);
+        const slowMA = getEMA(prices, slowPeriod);
+
+        const macdLine: number[] = [];
+        for (let i = 0; i < prices.length; i++) {
+            macdLine[i] = fastMA[i] - slowMA[i];
+        }
+
+        const signalLine = getEMA(macdLine.map(v => isNaN(v) ? 0 : v), signalPeriod);
+        // Note: Feeding 0 for NaNs might distort start, but standard MACD handles this by waiting for valid MACD values.
+        // Better: Find first non-NaN index.
+        let firstValid = 0;
+        while (firstValid < macdLine.length && isNaN(macdLine[firstValid])) firstValid++;
+
+        // slice valid macd
+        const validMacd = macdLine.slice(firstValid);
+        const validSignal = getEMA(validMacd, signalPeriod);
+
+        // Reconstruct full signal array
+        const finalSignal = new Array(firstValid).fill(NaN).concat(validSignal);
+
+        const histogram: number[] = [];
+        for (let i = 0; i < prices.length; i++) {
+            histogram[i] = macdLine[i] - finalSignal[i];
+        }
+
+        return {
+            macd: macdLine,
+            signal: finalSignal,
+            histogram: histogram
+        };
+    },
+
+    /**
+     * Bollinger Bands
+     * Returns: { upper, middle, lower }
+     */
+    bbands: (bars: OHLCVBar[], ...args: any[]): any => {
+        const { series: prices, rest } = resolveSeriesAndParams(bars, args);
+        const period = (rest[0] as number) || 20;
+        const stdDevMult = (rest[1] as number) || 2;
+
+        const middle = BUILTIN_INDICATORS.sma(bars, prices, period);
+
+        const upper: number[] = [];
+        const lower: number[] = [];
+
+        for (let i = 0; i < prices.length; i++) {
+            if (isNaN(middle[i])) {
+                upper.push(NaN);
+                lower.push(NaN);
+                continue;
+            }
+
+            // Calc StdDev
+            let sumSq = 0;
+            let count = 0;
+            for (let j = 0; j < period; j++) {
+                if (i - j >= 0) {
+                    const diff = prices[i - j] - middle[i];
+                    sumSq += diff * diff;
+                    count++;
+                }
+            }
+            const stdDev = Math.sqrt(sumSq / count);
+            upper.push(middle[i] + stdDev * stdDevMult);
+            lower.push(middle[i] - stdDev * stdDevMult);
+        }
+
+        return {
+            middle,
+            upper,
+            lower
+        };
+    },
+};
+
+const applyElementWise = (fn: (x: number) => number, arg: any): any => {
+    if (Array.isArray(arg)) {
+        return (arg as number[]).map(v => fn(v));
+    }
+    return fn(arg as number);
 };
 
 /**
@@ -279,9 +421,73 @@ const BUILTIN_HELPERS: Record<string, (...args: any[]) => any> = {
     },
 
     /**
-     * Absolute value
+     * Series Shift
      */
-    abs: (x: number): number => Math.abs(x),
+    shift: (series: number[], n: number = 1): number[] => {
+        if (!Array.isArray(series)) return series; // Fallback for scalar? Not applicable.
+        const result = new Array(series.length).fill(NaN);
+        for (let i = n; i < series.length; i++) {
+            result[i] = series[i - n];
+        }
+        return result;
+    },
+
+    /**
+     * Series Difference
+     */
+    diff: (series: number[]): number[] => {
+        if (!Array.isArray(series)) return [];
+        const result = new Array(series.length).fill(NaN);
+        for (let i = 1; i < series.length; i++) {
+            result[i] = series[i] - series[i - 1];
+        }
+        return result;
+    },
+
+    /**
+     * Average (Mean) of arguments
+     * avg(series1, series2) -> element-wise
+     * avg(1, 2, 3) -> 2
+     */
+    avg: (...args: any[]): any => {
+        if (args.length === 0) return 0;
+
+        // If first arg is array, assume element-wise average of series
+        if (Array.isArray(args[0])) {
+            const length = args[0].length;
+            const result = new Array(length).fill(0);
+
+            for (let i = 0; i < length; i++) {
+                let sum = 0;
+                let validCount = 0;
+                for (const series of args) {
+                    if (Array.isArray(series) && typeof series[i] === 'number' && !isNaN(series[i])) {
+                        sum += series[i];
+                        validCount++;
+                    } else if (typeof series === 'number' && !isNaN(series)) {
+                        sum += series;
+                        validCount++;
+                    }
+                }
+                result[i] = validCount > 0 ? sum / validCount : NaN;
+            }
+            return result;
+        }
+
+        // Scalar average
+        const sum = args.reduce((a, b) => a + (typeof b === 'number' ? b : 0), 0);
+        return sum / args.length;
+    },
+
+    /**
+     * Math Utilities - Element-wise support
+     */
+    log: (x: any) => applyElementWise(Math.log, x),
+    exp: (x: any) => applyElementWise(Math.exp, x),
+    sqrt: (x: any) => applyElementWise(Math.sqrt, x),
+    abs: (x: any) => applyElementWise(Math.abs, x),
+    floor: (x: any) => applyElementWise(Math.floor, x),
+    ceil: (x: any) => applyElementWise(Math.ceil, x),
 
     /**
      * Maximum
@@ -296,7 +502,7 @@ const BUILTIN_HELPERS: Record<string, (...args: any[]) => any> = {
     /**
      * Round
      */
-    round: (x: number): number => Math.round(x),
+    round: (x: any) => applyElementWise(Math.round, x),
 };
 
 /**
@@ -953,10 +1159,17 @@ export class Interpreter {
 
             // Check for plot function
             if (callee === 'plot') {
-                const [series, title, color] = evaluatedArgs;
+                const [series, title, color, style] = evaluatedArgs;
                 if (Array.isArray(series)) {
                     const name = (title as string) || 'Plot';
                     const lineColor = (color as string) || '#22C55E';
+                    const plotStyle = (style as string) || 'line';
+
+                    // Map style string to OverlayData type
+                    let type: 'line' | 'histogram' | 'area' = 'line';
+                    if (plotStyle === 'histogram') type = 'histogram';
+                    if (plotStyle === 'area') type = 'area';
+
                     const data = (series as number[])
                         .map((v, i) => ({
                             timestamp: this.bars[i]?.timestamp || '',
@@ -966,7 +1179,7 @@ export class Interpreter {
 
                     this.overlays.push({
                         name,
-                        type: 'line',
+                        type,
                         color: lineColor,
                         data,
                     });

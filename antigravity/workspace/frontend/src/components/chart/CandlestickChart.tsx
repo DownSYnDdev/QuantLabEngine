@@ -14,7 +14,7 @@ interface OHLCVBar {
 
 interface OverlayData {
     name: string;
-    type: 'line' | 'multi-line' | 'band';
+    type: 'line' | 'histogram' | 'area';
     color: string;
     data: { timestamp: string; value: number }[];
 }
@@ -53,7 +53,7 @@ export function CandlestickChart({
 
     // Update overlays when they change
     const updateOverlays = useCallback(async (chart: ReturnType<typeof import('lightweight-charts').createChart>, newOverlays: OverlayData[]) => {
-        const { LineSeries } = await import('lightweight-charts');
+        const { LineSeries, HistogramSeries, AreaSeries } = await import('lightweight-charts');
 
         // Remove old overlay series that are no longer needed
         const currentNames = new Set(newOverlays.map(o => o.name));
@@ -68,14 +68,31 @@ export function CandlestickChart({
         for (const overlay of newOverlays) {
             let series = overlaySeriesRef.current.get(overlay.name);
 
+            // Re-create series if type changes or doesn't exist
+            // (Simplification: just check existence. If type changes, we might need to remove and re-add, but usually names are unique per indicator type)
             if (!series) {
-                // Create new line series
-                series = chart.addSeries(LineSeries, {
-                    color: overlay.color,
-                    lineWidth: 2,
-                    priceLineVisible: false,
-                    lastValueVisible: true,
-                });
+                if (overlay.type === 'histogram') {
+                    series = chart.addSeries(HistogramSeries, {
+                        color: overlay.color,
+                        priceFormat: { type: 'volume' }, // Or standard
+                        priceScaleId: 'right', // Share scale or use overlay
+                    });
+                } else if (overlay.type === 'area') {
+                    series = chart.addSeries(AreaSeries, {
+                        lineColor: overlay.color,
+                        topColor: overlay.color,
+                        bottomColor: overlay.color + '00', // transparent gradient
+                        lineWidth: 2,
+                    });
+                } else {
+                    // Default to Line
+                    series = chart.addSeries(LineSeries, {
+                        color: overlay.color,
+                        lineWidth: 2,
+                        priceLineVisible: false,
+                        lastValueVisible: true,
+                    });
+                }
                 overlaySeriesRef.current.set(overlay.name, series);
             }
 

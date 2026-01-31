@@ -194,7 +194,14 @@ export class Parser {
         }
 
         // Variable assignment or expression
-        if (this.check(TokenType.IDENTIFIER)) {
+        // Allow expressions starting with potential expression tokens
+        if (
+            this.check(TokenType.IDENTIFIER) ||
+            this.check(TokenType.KEYWORD) ||
+            this.check(TokenType.NUMBER) ||
+            this.check(TokenType.STRING) ||
+            this.check(TokenType.LPAREN)
+        ) {
             return this.parseAssignmentOrExpression();
         }
 
@@ -761,11 +768,18 @@ export class Parser {
                 } as CallExpr;
             } else if (this.match(TokenType.DOT)) {
                 // Member access: obj.property
-                const propToken = this.consume(TokenType.IDENTIFIER, "Expected property name after '.'");
+                let propName: string;
+                if (this.check(TokenType.KEYWORD)) {
+                    propName = String(this.advance().value);
+                } else {
+                    const token = this.consume(TokenType.IDENTIFIER, "Expected property name after '.'");
+                    propName = String(token.value);
+                }
+
                 expr = {
                     type: 'MemberExpr',
                     object: expr,
-                    property: String(propToken.value),
+                    property: propName,
                     line: expr.line,
                     column: expr.column,
                 } as MemberExpr;
