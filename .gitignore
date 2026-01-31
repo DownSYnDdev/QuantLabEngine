@@ -1,0 +1,16 @@
+# Environment
+.env
+.env.*
+.DS_Store
+
+# Dependencies
+node_modules/
+package-lock.json
+
+# Simulation/Validation Results
+SimulationResults/
+*results.json
+
+# Local Gemini/Agent data
+.agent/
+.gemini/
