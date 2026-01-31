@@ -1,0 +1,19 @@
+{
+  "id": "inherited-config",
+  "displayName": "Inherited Config Example",
+  "parentConfigId": "base-config",
+  "baseCapital": 25000,
+  "challengeDefinitions": [
+    {
+      "id": "stage-2",
+      "name": "Extended Stage 2",
+      "rules": {
+        "profitTarget": 0.05,
+        "maxDrawdown": 0.03,
+        "consistencyRule": {
+          "minWinningDays": 5
+        }
+      }
+    }
+  ]
+}

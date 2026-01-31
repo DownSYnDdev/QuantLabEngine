@@ -1,0 +1,12 @@
+{
+  "id": "tenantB",
+  "name": "Beta Trading",
+  "domain": "prop.betatrading.io",
+  "branding": {
+    "logoUrl": "https://assets.betatrading.io/logo-dark.svg",
+    "primaryColor": "#FF5500"
+  },
+  "allowedConfigs": ["100k-eval-v1", "150k-straight-v1"],
+  "webhookSecret": "sec_550e8400...",
+  "dataProvider": "binance"
+}

@@ -1,0 +1,26 @@
+{
+  "id": "base-config",
+  "displayName": "Base Configuration Template",
+  "baseCapital": 10000,
+  "currency": "USD",
+  "variant": "evaluation",
+  "challengeDefinitions": [
+    {
+      "id": "stage-1",
+      "name": "Standard Stage 1",
+      "rules": {
+        "profitTarget": 0.10,
+        "maxDrawdown": 0.05,
+        "dailyLossLimit": 0.02
+      }
+    }
+  ],
+  "payoutRules": {
+    "stagedPayouts": [
+      {
+        "milestone": "stage-1-pass",
+        "payoutPercent": 100
+      }
+    ]
+  }
+}

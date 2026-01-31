@@ -1,0 +1,18 @@
+{
+  "id": "tenant-aware-config",
+  "displayName": "Tenant Aware Config",
+  "tenantId": "tenantA",
+  "baseCapital": 50000,
+  "allowedInstruments": ["EURUSD", "GBPUSD", "USDJPY"],
+  "challengeDefinitions": [
+    {
+      "id": "funded",
+      "name": "Live Simulation",
+      "rules": {
+        "profitTarget": 0,
+        "maxDrawdown": 0.10,
+        "dailyLossLimit": 0.015
+      }
+    }
+  ]
+}

@@ -1,0 +1,18 @@
+{
+  "id": "versioned-config",
+  "displayName": "Versioned Config V1",
+  "baseCapital": 100000,
+  "meta": {
+    "version": "1.0.0",
+    "effectiveDate": "2026-01-01"
+  },
+  "challengeDefinitions": [
+    {
+      "id": "phase-1",
+      "name": "Alpha Phase",
+      "rules": {
+        "profitTarget": 0.08
+      }
+    }
+  ]
+}
