@@ -1200,6 +1200,98 @@ export class Interpreter {
                 return undefined;
             }
 
+            // === TRADING FUNCTIONS ===
+
+            // buy(symbol, quantity) or buy(quantity) - defaults to current symbol
+            if (callee === 'buy') {
+                const symbol = evaluatedArgs.length > 1
+                    ? String(evaluatedArgs[0])
+                    : this.bars[0]?.symbol || 'UNKNOWN';
+                const quantity = evaluatedArgs.length > 1
+                    ? Number(evaluatedArgs[1])
+                    : Number(evaluatedArgs[0]);
+
+                if (isNaN(quantity) || quantity <= 0) {
+                    throw new InterpreterError('buy() requires a positive quantity', expr.line, expr.column);
+                }
+
+                // Return order request object (to be processed by order engine)
+                const orderRequest = {
+                    type: 'buy',
+                    symbol,
+                    quantity,
+                    orderType: 'MARKET',
+                    timestamp: new Date().toISOString(),
+                };
+                this.signals.push(`BUY:${symbol}:${quantity}`);
+                return orderRequest;
+            }
+
+            // sell(symbol, quantity) or sell(quantity)
+            if (callee === 'sell') {
+                const symbol = evaluatedArgs.length > 1
+                    ? String(evaluatedArgs[0])
+                    : this.bars[0]?.symbol || 'UNKNOWN';
+                const quantity = evaluatedArgs.length > 1
+                    ? Number(evaluatedArgs[1])
+                    : Number(evaluatedArgs[0]);
+
+                if (isNaN(quantity) || quantity <= 0) {
+                    throw new InterpreterError('sell() requires a positive quantity', expr.line, expr.column);
+                }
+
+                const orderRequest = {
+                    type: 'sell',
+                    symbol,
+                    quantity,
+                    orderType: 'MARKET',
+                    timestamp: new Date().toISOString(),
+                };
+                this.signals.push(`SELL:${symbol}:${quantity}`);
+                return orderRequest;
+            }
+
+            // order(symbol, side, quantity, type?, price?)
+            if (callee === 'order') {
+                const [symbol, side, quantity, orderType, price] = evaluatedArgs;
+
+                if (!symbol || typeof symbol !== 'string') {
+                    throw new InterpreterError('order() requires a symbol string', expr.line, expr.column);
+                }
+                if (side !== 'buy' && side !== 'sell') {
+                    throw new InterpreterError("order() side must be 'buy' or 'sell'", expr.line, expr.column);
+                }
+                if (isNaN(Number(quantity)) || Number(quantity) <= 0) {
+                    throw new InterpreterError('order() requires a positive quantity', expr.line, expr.column);
+                }
+
+                const orderRequest = {
+                    type: side,
+                    symbol: String(symbol),
+                    quantity: Number(quantity),
+                    orderType: String(orderType || 'MARKET').toUpperCase(),
+                    price: price !== undefined ? Number(price) : undefined,
+                    timestamp: new Date().toISOString(),
+                };
+                this.signals.push(`ORDER:${side.toUpperCase()}:${symbol}:${quantity}`);
+                return orderRequest;
+            }
+
+            // close(symbol?) - close all positions for symbol
+            if (callee === 'close') {
+                const symbol = evaluatedArgs.length > 0
+                    ? String(evaluatedArgs[0])
+                    : this.bars[0]?.symbol || 'UNKNOWN';
+
+                const closeRequest = {
+                    type: 'close',
+                    symbol,
+                    timestamp: new Date().toISOString(),
+                };
+                this.signals.push(`CLOSE:${symbol}`);
+                return closeRequest;
+            }
+
             throw new InterpreterError(`Unknown function: ${callee}`, expr.line, expr.column);
         } finally {
             this.callDepth--;
