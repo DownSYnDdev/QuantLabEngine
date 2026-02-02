@@ -1,0 +1,27 @@
+# QuantLab ConfigMap (Non-sensitive configuration)
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: quantlab-config
+  namespace: quantlab
+  labels:
+    app: quantlab
+data:
+  # API Configuration
+  api-url: "https://api.quantlab.example.com"
+  api-port: "3001"
+  frontend-port: "3000"
+  
+  # Feature Flags
+  enable-websocket: "true"
+  enable-backtesting: "true"
+  
+  # Rate Limiting
+  rate-limit-window-ms: "60000"
+  rate-limit-max-requests: "100"
+  
+  # Logging
+  log-level: "info"
+  
+  # Cache TTL (seconds)
+  cache-ttl: "300"

@@ -1,0 +1,8 @@
+# QuantLab Kubernetes Namespace
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: quantlab
+  labels:
+    app.kubernetes.io/name: quantlab
+    app.kubernetes.io/part-of: quantlab-platform

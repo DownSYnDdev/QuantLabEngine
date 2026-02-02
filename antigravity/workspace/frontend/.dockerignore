@@ -1,0 +1,19 @@
+# Ignore node_modules, build artifacts, and sensitive files
+node_modules
+.next
+.git
+.gitignore
+*.md
+*.log
+.env*
+.DS_Store
+Dockerfile
+docker-compose*.yml
+k8s
+.github
+coverage
+.nyc_output
+*.test.ts
+*.spec.ts
+__tests__
+out
